@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-// import { Button } from '@material-ui/core'; //Buttonをインポート
+import { Button } from '@material-ui/core'; //Buttonをインポート
+import { Link } from "react-router-dom";
 
 function Example(): React.ReactElement {
     return (
@@ -11,17 +12,19 @@ function Example(): React.ReactElement {
                         <div className="card-header">Example Component</div>
 
                         <div className="card-body">I'm an example component!</div>
-
-                        {/* <Button color="primary" variant="contained">Hello World</Button>  */}
                     </div>
                 </div>
             </div>
+            
+            <Link to="/">
+                <Button color="primary" variant="contained">Hello World</Button>
+            </Link> 
         </div>
     );
 }
 
 export default Example;
 
-if (document.getElementById('example')) {
-    ReactDOM.render(<Example />, document.getElementById('example'));
-}
+// if (document.getElementById('example')) {
+//     ReactDOM.render(<Example />, document.getElementById('example'));
+// }
