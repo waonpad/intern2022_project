@@ -27,10 +27,10 @@ pull:
 	git pull origin ${MAIN_BRANCH}
 
 newb-%:
-	git checkout -b ${@:new-%=%}
+	git checkout -b ${@:newb-%=%}
 
 delb-%:
-	git branch -d ${@:del-%=%}
+	git branch -d ${@:delb-%=%}
 
 
 
