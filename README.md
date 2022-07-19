@@ -8,7 +8,7 @@ make build
 ```
 
 ## ホットリロード
-npm watch-pollで自動コンパイル
+npm watch-pollで自動コンパイル  
 バッチファイルによりローカルからファイルを監視してホットリロード
 
 ## SPA
