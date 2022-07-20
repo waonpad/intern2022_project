@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { Button, Card } from '@material-ui/core'; //Buttonをインポート
+import { Button, Card } from '@material-ui/core';
 import { Link } from "react-router-dom";
 
 function Home(): React.ReactElement {
