@@ -2,7 +2,6 @@
 https://github.com/mariebell/fullstack-project
 
 ## 起動手順
-(.env.sampleを.envにリネーム)
 ```
 make build
 ```
