@@ -6,7 +6,7 @@ build:
 	docker-compose up -d
 	docker-comopse exec ${APP_CONTAINER} composer install
 	docker-compose exec ${APP_CONTAINER} php artisan key:generate
-	docker-compose exec ${APP_CONTAINER} npm install--save --legacy-peer-deps
+	docker-compose exec ${APP_CONTAINER} npm install --save --legacy-peer-deps
 	npm install
 
 up:
