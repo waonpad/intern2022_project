@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import ReactLoading from 'react-loading';
 import ReactDOM from 'react-dom';
 import { Button, Card } from '@material-ui/core';
 import { Link, useHistory } from "react-router-dom";
@@ -42,12 +43,29 @@ function GlobalNav(): React.ReactElement {
             </React.Fragment>
         );
     } else {
+        // 自分の情報を取得する
+        const [myid, setMyId] = useState('');
+
+        useEffect(() => {
+            axios.get(`/api/myself`).then(res => {
+                if (res.status === 200) {
+                    setMyId(res.data.screen_name);
+                    console.log(res);
+                }
+            });
+        }, [])
+
         AuthButtons = (
-            <li>
-                <div onClick={logoutSubmit}>
-                    <span className="text-white">ログアウト</span>
-                </div>
-            </li>
+            <React.Fragment>
+                <li>
+                    {myid ? <Link to={"/user/" + myid}><span>{myid}</span></Link> : <ReactLoading type="spin" height="20px" width="20px" />}
+                </li>
+                <li>
+                    <div onClick={logoutSubmit}>
+                        <span className="text-white">ログアウト</span>
+                    </div>
+                </li>
+            </React.Fragment>
         );
     }
 
