@@ -17,6 +17,7 @@ class AuthController extends Controller
 {
     public function register(Request $request){
         $validator = Validator::make($request->all(), [
+            'screen_name'=>'required|max:16|unique:users,screen_name',
             'name'=>'required|max:191',
             'email'=>'required|email|max:191|unique:users,email',
             'password'=>'required|min:8',
@@ -28,6 +29,7 @@ class AuthController extends Controller
             ]);
         } else {
             $user = User::create([
+                'screen_name'=>$request->screen_name,
                 'name'=>$request->name,
                 'email'=>$request->email,
                 'password'=>Hash::make($request->password),
@@ -37,7 +39,8 @@ class AuthController extends Controller
 
             return response()->json([
                 'status'=>200,
-                'username'=>$user->name,
+                'screen_name'=>$user->screen_name,
+                'name'=>$user->name,
                 'token'=>$token,
                 'message'=>'Registerd Successfully'
             ]);
@@ -66,7 +69,8 @@ class AuthController extends Controller
 
                 return response()->json([
                     'status'=>200,
-                    'username'=>$user->name,
+                    'screen_name'=>$user->screen_name,
+                    'name'=>$user->name,
                     'token'=>$token,
                     'message'=>'ログインに成功しました。'
                 ]);

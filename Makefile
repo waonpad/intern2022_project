@@ -58,6 +58,9 @@ mig:
 dbrefresh:
 	docker-compose exec ${APP_CONTAINER} php artisan migrate:refresh
 
+dbfresh:
+	docker-compose exec ${APP_CONTAINER} php artisan migrate:fresh
+
 dbreset:
 	docker-compose exec ${APP_CONTAINER} php artisan migrate:reset
 

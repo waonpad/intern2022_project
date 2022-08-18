@@ -8,6 +8,8 @@ import About from './pages/About';
 import GlobalNav from './components/GlobalNav';
 import Register from './pages/Register';
 import Login from './pages/Login';
+import User from './pages/User';
+import Page404 from './pages/Page404';
 
 import axios, {AxiosRequestConfig, AxiosResponse, AxiosError} from 'axios';
 
@@ -35,6 +37,8 @@ function App(): React.ReactElement {
                 <Route path='/about' exact component={About} />
                 <Route path='/register' exact component={Register} />
                 <Route path='/login' exact component={Login} />
+                <Route path='/user/:id' exact component={User} />
+                <Route path='*' exact component={Page404} />
             </Switch>
         </div>
     );

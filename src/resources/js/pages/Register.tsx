@@ -8,10 +8,12 @@ function Register(): React.ReactElement {
     const history = useHistory();
 
     const [registerInput, setRegister] = useState({
+        screen_name: '',
         name: '',
         email: '',
         password: '',
         error_list: {
+            "screen_name": '',
             "name": '',
             "email": '',
             "password": '',
@@ -27,6 +29,7 @@ function Register(): React.ReactElement {
         e.preventDefault();
 
         const data = {
+            screen_name: registerInput.screen_name,
             name: registerInput.name,
             email: registerInput.email,
             password: registerInput.password,
@@ -36,7 +39,7 @@ function Register(): React.ReactElement {
             axios.post(`/api/register`, data).then(res => {
                 if(res.data.status === 200){
                     localStorage.setItem('auth_token', res.data.token);
-                    localStorage.setItem('auth_name', res.data.username);
+                    localStorage.setItem('auth_name', res.data.name);
                     swal("Success", res.data.message, "success");
                     history.push('/')
                 } else {
@@ -55,6 +58,11 @@ function Register(): React.ReactElement {
                     </div>
                     <div className="card-body">
                         <form onSubmit={registerSubmit}>
+                            <div className="form-group mb-3">
+                                <label>User Id</label>
+                                <input type="" name="screen_name" onChange={handleInput} value={registerInput.screen_name} className="form-control" />
+                                <span>{registerInput.error_list.screen_name}</span>
+                            </div>
                             <div className="form-group mb-3">
                                 <label>User Name</label>
                                 <input type="" name="name" onChange={handleInput} value={registerInput.name} className="form-control" />
