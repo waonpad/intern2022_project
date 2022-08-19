@@ -61,7 +61,7 @@ class AuthController extends Controller
             $user = User::where('email', $request->email)->first();
             if (! $user || ! Hash::check($request->password, $user->password)) {
                 return response()->json([
-                    'status'=>401,
+                    'status'=>400,
                     'message'=>'入力情報が不正です',
                 ]);
             } else {

@@ -37,7 +37,7 @@ function Login(): React.ReactElement {
                     swal("ログイン成功", res.data.message, "success");
                     history.push('/');
                     location.reload();
-                } else if (res.data.status === 401){
+                } else if (res.data.status === 400){
                     swal("注意", res.data.message, "warning");
                 } else {
                     setLogin({...loginInput, error_list: res.data.validation_errors});

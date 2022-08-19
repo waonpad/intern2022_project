@@ -1,6 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import {BrowserRouter, Route, Switch,} from 'react-router-dom';
+import {BrowserRouter, Route, Switch, Link} from 'react-router-dom';
+import { renderToStaticMarkup } from "react-dom/server";
+import { Button, Card } from '@material-ui/core';
+import swal from 'sweetalert';
 
 import Top from './pages/Top';
 import Example from './pages/Example';
@@ -25,6 +28,51 @@ axios.interceptors.request.use(function(config){
     config.headers.Authorization = token ? `Bearer ${token}` : '';
     return config;
 });
+// https://feeld-uni.com/entry/2022/04/11/141900
+axios.interceptors.response.use(
+    async (response) => {
+        // if (response.status === 200) {
+        //     console.log('Posted Successfully');
+        // }
+        return response;
+    }, error => {
+        const {status} = error.response;
+        switch (status) {
+            case 400:
+            console.log(error.response);
+            break;
+            case 401:
+            console.log("Unauthorized");
+            // https://kk-web.link/blog/20181012
+            swal({
+                title: "Unauthorized",
+                content: {
+                    attributes: {
+                        innerHTML: renderToStaticMarkup(
+                            <React.Fragment>
+                                <Button color="primary" variant="contained">Register</Button>
+                                <Button color="primary" variant="contained">Login</Button>
+                            </React.Fragment>
+                        ),
+                    },
+                    element: "div",
+                },
+                icon: "info",
+            })
+            break;
+            case 404:
+            console.log(error.response?.status);
+            break;
+            case 500:
+            console.log("server error");
+            break;
+            default:
+            console.log("an unknown error occurred");
+            break;
+        }
+        return Promise.reject(error);
+    },
+);
 
 function App(): React.ReactElement {
     return (

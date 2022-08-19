@@ -3,7 +3,8 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\AuthController; 
-use App\Http\Controllers\API\UserController; 
+use App\Http\Controllers\API\UserController;
+use App\Http\Controllers\API\FollowController;
 
 /*
 |--------------------------------------------------------------------------
@@ -25,6 +26,9 @@ Route::post('login', [AuthController::class, 'login']);
 
 Route::middleware('auth:sanctum')->group(function() {
     Route::post('logout', [AuthController::class, 'logout']);
+    Route::post('follow', [FollowController::class, 'follow']);
+    Route::post('unfollow', [FollowController::class, 'unfollow']);
+    Route::get('ffcheck', [FollowController::class, 'ffcheck']);
 });
 
 Route::get('getuser', [UserController::class, 'getuser']);
