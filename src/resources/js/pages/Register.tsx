@@ -42,6 +42,7 @@ function Register(): React.ReactElement {
                     localStorage.setItem('auth_name', res.data.name);
                     swal("Success", res.data.message, "success");
                     history.push('/')
+                    location.reload();
                 } else {
                     setRegister({...registerInput, error_list: res.data.validation_errors});
                 }
