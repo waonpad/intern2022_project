@@ -6,22 +6,21 @@ import { Link, useHistory } from "react-router-dom";
 import axios from 'axios';
 import swal from 'sweetalert';
 
+import { useAuth } from "../AuthContext";
+
 function GlobalNav(): React.ReactElement {
 
     const history = useHistory();
+    const auth = useAuth();
 
-    const logoutSubmit = (e: any) => {
-        e.preventDefault();
-
-        axios.post(`/api/logout`).then(res => {
-            if (res.data.status === 200) {
-                localStorage.removeItem('auth_token');
-                localStorage.removeItem('auth_name');
-                swal("ログアウトしました", res.data.message, "success");
-                history.push('/');
-                location.reload();
-            } 
-        });
+    const logout = () => {
+        axios.get('/sanctum/csrf-cookie').then(() => {
+        auth?.signout().then(() => {
+            swal("ログアウトしました", "ログアウト成功", "success");
+            history.push('/');
+            location.reload();
+        })
+        })
     }
 
     var AuthButtons: any = null;
@@ -43,28 +42,13 @@ function GlobalNav(): React.ReactElement {
             </React.Fragment>
         );
     } else {
-        // 自分の情報を取得する
-        const [myid, setMyId] = useState('');
-
-        useEffect(() => {
-            axios.get(`/api/myself`).then(res => {
-                if (res.status === 200) {
-                    setMyId(res.data.screen_name);
-                    console.log(res);
-                }
-            });
-        }, [])
-
         AuthButtons = (
             <React.Fragment>
-                <li>
-                    {myid ? <Link to={"/user/" + myid}><span>{myid}</span></Link> : <ReactLoading type="spin" height="20px" width="20px" />}
-                </li>
-                <li>
-                    <div onClick={logoutSubmit}>
-                        <span className="text-white">ログアウト</span>
-                    </div>
-                </li>
+                <div>
+                    {/* {myid ? <Link to={"/user/" + myid}><span>{myid}</span></Link> : <ReactLoading type="spin" height="20px" width="20px" />} */}
+                    aaaaaaaaa
+                </div>
+                <Button variant="contained" onClick={logout}>ログアウト</Button>
             </React.Fragment>
         );
     }

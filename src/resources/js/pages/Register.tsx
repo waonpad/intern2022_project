@@ -1,94 +1,123 @@
 import React, { useState } from "react";
 import axios from 'axios';
 import swal from 'sweetalert';
-import { useHistory } from 'react-router-dom';
+import { useHistory, Link } from 'react-router-dom';
+import { useForm, SubmitHandler } from "react-hook-form";
+import TextField from '@mui/material/TextField';
+import { LoadingButton } from '@mui/lab';
 
-function Register(): React.ReactElement {
+import {useAuth} from "../AuthContext";
 
-    const history = useHistory();
+interface EmailAndPasswordData {
+    screen_name: string;
+    name: string;
+    email: string;
+    password: string;
+    password_confirmation: string;
+    submit: string;
+}
 
-    const [registerInput, setRegister] = useState({
-        screen_name: '',
-        name: '',
-        email: '',
-        password: '',
-        error_list: {
-            "screen_name": '',
-            "name": '',
-            "email": '',
-            "password": '',
-        },
-    });
+function Register(): React.ReactElement{
+    
+    const { register, handleSubmit, setError, formState: { errors } } = useForm<EmailAndPasswordData>();
+    const history = useHistory()
+    const [loading, setLoading] = useState(false);
+    const auth = useAuth()
 
-    const handleInput = (e: any) => {
-        e.persist();
-        setRegister({...registerInput, [e.target.name]: e.target.value });
+    const onSubmit: SubmitHandler<EmailAndPasswordData> = (data: EmailAndPasswordData) => {
+        setLoading(true)
+        axios.get('/sanctum/csrf-cookie').then(() => {
+            auth?.register(data).then(() => {
+                swal("Success", "登録成功", "success");
+                history.push('/')
+                location.reload();
+            }).catch((error) => {
+                setError('submit', {
+                type: 'manual',
+                message: '登録に失敗しました。再度登録をしてください'
+            })
+                setLoading(false)
+            })
+        })
     }
 
-    const registerSubmit = (e: any) => {
-        e.preventDefault();
-
-        const data = {
-            screen_name: registerInput.screen_name,
-            name: registerInput.name,
-            email: registerInput.email,
-            password: registerInput.password,
-        }
-
-        axios.get('/sanctum/csrf-cookie').then(response => {
-            axios.post(`/api/register`, data).then(res => {
-                if(res.data.status === 200){
-                    localStorage.setItem('auth_token', res.data.token);
-                    localStorage.setItem('auth_name', res.data.name);
-                    swal("Success", res.data.message, "success");
-                    history.push('/')
-                    location.reload();
-                } else {
-                    setRegister({...registerInput, error_list: res.data.validation_errors});
-                }
-            });
-        });
-    }
-
-    return (<div className="container">
-        <div className="row justify-content-center">
-            <div className="col-md-6 col-lg-6 mx-auto">
-                <div className="card">
-                    <div className="card-header">
-                        <h4>Register</h4>
-                    </div>
-                    <div className="card-body">
-                        <form onSubmit={registerSubmit}>
-                            <div className="form-group mb-3">
-                                <label>User Id</label>
-                                <input type="" name="screen_name" onChange={handleInput} value={registerInput.screen_name} className="form-control" />
-                                <span>{registerInput.error_list.screen_name}</span>
-                            </div>
-                            <div className="form-group mb-3">
-                                <label>User Name</label>
-                                <input type="" name="name" onChange={handleInput} value={registerInput.name} className="form-control" />
-                                <span>{registerInput.error_list.name}</span>
-                            </div>
-                            <div className="form-group mb-3">
-                                <label>Mail Address</label>
-                                <input type="" name="email" onChange={handleInput} value={registerInput.email} className="form-control" />
-                                <span>{registerInput.error_list.email}</span>
-                            </div>
-                            <div className="form-group mb-3">
-                                <label>Password</label>
-                                <input type="" name="password" onChange={handleInput} value={registerInput.password} className="form-control" />
-                                <span>{registerInput.error_list.password}</span>
-                            </div>
-                            <div className="form-group mb-3">
-                                <button type="submit" className="btn btn-primary">Register</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
+    return (
+        <div className="p-4 max-w-screen-sm mx-auto">
+        <h1 className="text-center text-xl font-bold">アカウント作成</h1>
+        <p className="text-center"><Link to="/login" className="text-sm c-link">アカウントを持っている方はこちら</Link></p>
+        <form className="py-4" onSubmit={handleSubmit(onSubmit)}>
+        <div className="py-4">
+            <TextField 
+            fullWidth
+            variant="outlined" 
+            label="ID" 
+            {...register('screen_name', {
+                required: '入力してください'
+            })} 
+            />
+            {errors.screen_name && <span className="block text-red-400">{errors.screen_name.message}</span>}
         </div>
-    </div>
-    );
+        <div className="py-4">
+            <TextField 
+            fullWidth
+            variant="outlined" 
+            label="名前" 
+            {...register('name', {
+                required: '入力してください'
+            })} 
+            />
+            {errors.name && <span className="block text-red-400">{errors.name.message}</span>}
+        </div>
+        <div className="py-4">
+            <TextField 
+            fullWidth
+            variant="outlined" 
+            label="メールアドレス" 
+            {...register('email', {
+                required: '入力してください'
+            })} 
+            />
+            {errors.email && <span className="block text-red-400">{errors.email.message}</span>}
+        </div>
+        <div className="py-4">
+            <TextField 
+            fullWidth
+            id="password"
+            type="password" 
+            variant="outlined" 
+            label="パスワード" 
+            {...register('password', {
+                required: '入力してください',
+                minLength: {
+                value: 8,
+                message: '8文字以上で入力してください'
+                }
+            })} 
+            />
+            {errors.password && <span className="block text-red-400">{errors.password.message}</span>}
+        </div>
+        <div className="py-4">
+            <TextField 
+            fullWidth
+            type="password" 
+            variant="outlined" 
+            label="パスワード確認" 
+            {...register('password_confirmation', {
+                required: '入力してください',
+                validate: {
+                match: value => value === (document.getElementById('password') as HTMLInputElement).value || 'パスワードが一致しません'
+                }
+            })} 
+            />
+            {errors.password_confirmation && <span className="block text-red-400">{errors.password_confirmation.message}</span>}
+        </div>
+        <div>
+            <LoadingButton type="submit" loading={loading} variant="contained" fullWidth>アカウントを作成する</LoadingButton>
+            {errors.submit && <span className="block text-red-400">{errors.submit.message}</span>}
+        </div>
+        </form>
+        </div>
+    )
 }
 
 export default Register

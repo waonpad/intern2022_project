@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import { Button, Card } from '@material-ui/core';
 import { Link } from "react-router-dom";
 
-function Home(): React.ReactElement {
+function Top(): React.ReactElement {
     return (
         <div className="container">
             <Card>
@@ -15,4 +15,4 @@ function Home(): React.ReactElement {
     );
 }
 
-export default Home;
+export default Top;

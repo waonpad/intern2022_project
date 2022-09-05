@@ -13,6 +13,7 @@ import Register from './pages/Register';
 import Login from './pages/Login';
 import User from './pages/User';
 import Page404 from './pages/Page404';
+import ProvideAuth, { PrivateRoute, PublicRoute } from './AuthContext' //追加
 
 import axios, {AxiosRequestConfig, AxiosResponse, AxiosError} from 'axios';
 
@@ -76,24 +77,26 @@ axios.interceptors.response.use(
 
 function App(): React.ReactElement {
     return (
-        <div>
-            <GlobalNav />
-            <Switch>
-                {/* ここに、pathと対応するコンポーネントを書いていく */}
-                <Route path='/' exact component={Top} />
-                <Route path='/example' exact component={Example} />
-                <Route path='/about' exact component={About} />
-                <Route path='/register' exact component={Register} />
-                <Route path='/login' exact component={Login} />
-                <Route path='/user/:id' exact component={User} />
-                <Route path='*' exact component={Page404} />
-            </Switch>
-        </div>
+        <ProvideAuth> 
+            <BrowserRouter>
+                <div>
+                    <GlobalNav />
+                    <Switch>
+                        {/* ここに、pathと対応するコンポーネントを書いていく */}
+                        <Route path='/' exact component={Top} />
+                        <Route path='/example' exact component={Example} />
+                        <PrivateRoute path='/about' exact><About/></PrivateRoute>
+                        <PublicRoute path='/register' exact><Register/></PublicRoute>
+                        <PublicRoute path='/login' exact><Login/></PublicRoute>
+                        <Route path='/user/:id' exact component={User} />
+                        <Route path='*' exact component={Page404} />
+                    </Switch>
+                </div>
+            </BrowserRouter>
+        </ProvideAuth>
     );
 }
 
 ReactDOM.render((
-<BrowserRouter>
     <App />
-</BrowserRouter>
 ), document.getElementById('app'))
