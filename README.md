@@ -15,3 +15,6 @@ src/resources/js/route.tsxによりルーティング
 
 ## ResetCSS
 https://raw.githubusercontent.com/twbs/bootstrap/v4-dev/dist/css/bootstrap-reboot.css
+
+## 認証とリダイレクト  
+https://akiblog10.com/authentication-spa-laravel-react/  
