@@ -47,7 +47,6 @@ function User(): React.ReactElement {
         name: '',
         email: '',
         password: '',
-        status: true,
     });
 
     const data = {

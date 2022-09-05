@@ -1,80 +1,83 @@
 import React, { useState } from "react";
 import swal from "sweetalert";
-import { useHistory } from 'react-router-dom';
+import { useHistory, Link } from 'react-router-dom';
 import axios from 'axios';
+import { useForm, SubmitHandler } from "react-hook-form";
+import TextField from '@mui/material/TextField';
+import { LoadingButton } from '@mui/lab';
+
+import {useAuth} from "../AuthContext";
+
+interface LoginData {
+    email: string;
+    password: string;
+    submit: string;
+}
 
 function Login(): React.ReactElement {
-
-    const history = useHistory();
-
-    const [loginInput, setLogin] = useState({
-        email: '',
-        password: '',
-        error_list: {
-            "email": '',
-            "password": '',
-        },
-    });
-
-    const handleInput = (e: any) => {
-        e.persist();
-        setLogin({...loginInput, [e.target.name]: e.target.value});
+    
+    const { register, handleSubmit, setError, clearErrors, formState: { errors } } = useForm<LoginData>();
+    const history = useHistory()
+    const [loading, setLoading] = useState(false);
+	const auth = useAuth();
+    
+    const onSubmit: SubmitHandler<LoginData> = (data: LoginData) => {
+        setLoading(true)
+        axios.get('/sanctum/csrf-cookie').then(() => {
+			auth?.signin(data).then(() => {
+				swal("ログイン成功", "ログイン成功", "success");
+			  	history.push('/');
+				location.reload();
+			}).catch(error => {
+			  	console.log(error)
+			  	setError('submit', {
+				type: 'manual',
+				message: 'ログインに失敗しました'
+			})
+			  	setLoading(false)
+			})
+		})
     }
+      
 
-    const loginSubmit = (e: any) => {
-        e.preventDefault();
-
-        const data = {
-            email: loginInput.email,
-            password: loginInput.password,
-        }
-
-        axios.get('/sanctum/csrf-cookie').then(response => {
-            axios.post(`api/login`, data).then(res => {
-                if(res.data.status === 200){
-                    localStorage.setItem('auth_token', res.data.token);
-                    localStorage.setItem('auth_name', res.data.name);
-                    swal("ログイン成功", res.data.message, "success");
-                    history.push('/');
-                    location.reload();
-                } else if (res.data.status === 400){
-                    swal("注意", res.data.message, "warning");
-                } else {
-                    setLogin({...loginInput, error_list: res.data.validation_errors});
-                }
-            });
-        });
-    }
-
-    return (<div className="container">
-            <div className="row justify-content-center">
-                <div className="col-md-6 col-lg-6 mx-auto">
-                    <div className="card">
-                        <div className="card-header">
-                            <h4>Login</h4>
-                        </div>
-                        <div className="card-body">
-                            <form onSubmit={loginSubmit}>
-                                <div className="form-group mb-3">
-                                    <label>Mail Address</label>
-                                    <input type="email" name="email" onChange={handleInput} value={loginInput.email} className="form-control" />
-                                    <span>{loginInput.error_list.email}</span>
-                                </div>
-                                <div className="form-group mb-3">
-                                    <label>Password</label>
-                                    <input type="password" name="password" onChange={handleInput} value={loginInput.password} className="form-control" />
-                                    <span>{loginInput.error_list.password}</span>
-                                </div>
-                                <div className="form-group mb-3">
-                                    <button type="submit" className="btn btn-primary">Login</button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    );
+    return (
+		<div className="p-4 max-w-screen-sm mx-auto">
+		<h1 className="text-center text-xl font-bold pb-4">ログイン</h1>
+		<p className="text-center"><Link to="/register" className="text-sm c-link">アカウントを持っていない方はこちら</Link></p>
+		<form className="py-4" onSubmit={e => {clearErrors(); handleSubmit(onSubmit)(e)}}>
+			<div className="py-4">
+			<TextField 
+				fullWidth
+				variant="outlined" 
+				label="メールアドレス" 
+				{...register('email', {
+				required: '入力してください'
+				})} 
+			/>
+			{errors.email && <span className="block text-red-400">{errors.email.message}</span>}
+			</div>
+			<div className="py-4">
+			<TextField 
+				fullWidth
+				id="password"
+				type="password" 
+				variant="outlined" 
+				label="パスワード" 
+				{...register('password', {
+				required: '入力してください'
+				})} 
+			/>
+			{errors.password && <span className="block text-red-400">{errors.password.message}</span>}
+			</div>
+			<div className="text-center">
+			<div>
+				<LoadingButton loading={loading} type="submit" variant="contained" fullWidth>Login</LoadingButton>
+			</div>
+			{errors.submit && <span className="block text-red-400">{errors.submit.message}</span>}
+			</div>
+		</form>
+		</div>
+    )
 }
 
 export default Login;

@@ -15,10 +15,12 @@ class UserController extends Controller
         $user = User::where('screen_name', $request->screen_name)->first();
 
         return response()->json([
+            'id'=>$user->id,
             'screen_name'=>$user->screen_name,
             'name'=>$user->name,
             'email'=>$user->email,
-            'password'=>$user->password,
+            'created_at'=>$user->created_at,
+            // 'password'=>$user->password,
         ]);
     }
 

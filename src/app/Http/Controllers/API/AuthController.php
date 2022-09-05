@@ -21,11 +21,16 @@ class AuthController extends Controller
             'name'=>'required|max:191',
             'email'=>'required|email|max:191|unique:users,email',
             'password'=>'required|min:8',
+            'password_confirmation'=>'required|min:8',
         ]);
 
         if($validator->fails()){
             return response()->json([
                 'validation_errors'=>$validator->errors(),
+            ]);
+        } else if($request->password !== $request->password_confirmation) {
+            return response()->json([
+                'message'=>'パスワード不一致',
             ]);
         } else {
             $user = User::create([
@@ -38,10 +43,14 @@ class AuthController extends Controller
             $token = $user->createToken($user->email.'_Token')->plainTextToken;
 
             return response()->json([
-                'status'=>200,
-                'screen_name'=>$user->screen_name,
-                'name'=>$user->name,
+                'user'=>[
+                    'id'=>$user->id,
+                    'screen_name'=>$user->screen_name,
+                    'name'=>$user->name,
+                    'email'=>$user->email,
+                ],
                 'token'=>$token,
+                'status'=>200,
                 'message'=>'Registerd Successfully'
             ]);
         }
@@ -59,19 +68,31 @@ class AuthController extends Controller
             ]);
         } else {
             $user = User::where('email', $request->email)->first();
+
             if (! $user || ! Hash::check($request->password, $user->password)) {
                 return response()->json([
                     'status'=>400,
                     'message'=>'入力情報が不正です',
                 ]);
+            } 
+            else if (null !== $request->bearerToken()) {
+                // https://laracasts.com/discuss/channels/laravel/how-to-get-current-access-token-in-sanctum
+                return response()->json([
+                    'status'=>400,
+                    'message'=>'既にログインしています',
+                ]);
             } else {
                 $token = $user->createToken($user->email.'_Token')->plainTextToken;
 
                 return response()->json([
-                    'status'=>200,
-                    'screen_name'=>$user->screen_name,
-                    'name'=>$user->name,
+                    'user'=>[
+                        'id'=>$user->id,
+                        'screen_name'=>$user->screen_name,
+                        'name'=>$user->name,
+                        'email'=>$user->email,
+                    ],
                     'token'=>$token,
+                    'status'=>200,
                     'message'=>'ログインに成功しました。'
                 ]);
             }

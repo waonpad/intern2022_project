@@ -17,7 +17,7 @@ use App\Http\Controllers\API\FollowController;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/myself', function (Request $request) {
+Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user(); // ログイン中のユーザー情報を取得
 });
 
