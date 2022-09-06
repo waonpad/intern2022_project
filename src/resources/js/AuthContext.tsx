@@ -1,5 +1,6 @@
 import axios, { AxiosResponse } from "axios";
-import React, {useContext, createContext, useState, ReactNode, useEffect} from "react"
+import React, {useContext, createContext, useState, ReactNode, useEffect } from "react"
+import ReactLoading from 'react-loading';
 import {Route, Redirect, useHistory} from "react-router-dom"
 
 interface User {
@@ -51,11 +52,18 @@ const authContext = createContext<authProps | null>(null)
 
 const ProvideAuth = ({children}: Props) => {
 	const auth = useProvideAuth();
-	return (
-		<authContext.Provider value={auth}>
-		{children}
-		</authContext.Provider>
-	)
+	if (auth.load) {
+		return (
+			<ReactLoading type="spin" height="100px" width="100px" />
+		)
+	}
+	else {
+		return (
+			<authContext.Provider value={auth}>
+			{children}
+			</authContext.Provider>
+		)
+	}
 }
 export default ProvideAuth
 
@@ -65,6 +73,8 @@ export const useAuth = () => {
 
 const useProvideAuth = () => {
 	const [user, setUser] = useState<User | null>(null);
+
+	const [load, setLoad] = useState(true); // 最初にユーザー情報を取得して認証状態を確認するまでロード画面を表示させる
 
 	const register = (registerData: RegisterData) => {
 		return axios.post('/api/register', registerData).then((res) => {
@@ -122,8 +132,10 @@ const useProvideAuth = () => {
 	useEffect(() => {
 		axios.get('/api/user').then((res) => {
 		setUser(res.data)
+		setLoad(false)
 		}).catch((error) => {
 		setUser(null)
+		setLoad(false)
 		})
 	}, [])
 
@@ -132,7 +144,8 @@ const useProvideAuth = () => {
 		register,
 		signin,
 		signout,
-		saveProfile
+		saveProfile,
+		load
 	}
 }
 

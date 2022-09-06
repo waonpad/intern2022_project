@@ -45,21 +45,21 @@ axios.interceptors.response.use(
             case 401:
             console.log("Unauthorized");
             // https://kk-web.link/blog/20181012
-            swal({
-                title: "Unauthorized",
-                content: {
-                    attributes: {
-                        innerHTML: renderToStaticMarkup(
-                            <React.Fragment>
-                                <Button color="primary" variant="contained">Register</Button>
-                                <Button color="primary" variant="contained">Login</Button>
-                            </React.Fragment>
-                        ),
-                    },
-                    element: "div",
-                },
-                icon: "info",
-            })
+            // swal({
+            //     title: "Unauthorized",
+            //     content: {
+            //         attributes: {
+            //             innerHTML: renderToStaticMarkup(
+            //                 <React.Fragment>
+            //                     <Button color="primary" variant="contained">Register</Button>
+            //                     <Button color="primary" variant="contained">Login</Button>
+            //                 </React.Fragment>
+            //             ),
+            //         },
+            //         element: "div",
+            //     },
+            //     icon: "info",
+            // })
             break;
             case 404:
             console.log(error.response?.status);

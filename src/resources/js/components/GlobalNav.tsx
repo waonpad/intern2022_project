@@ -13,6 +13,8 @@ function GlobalNav(): React.ReactElement {
     const history = useHistory();
     const auth = useAuth();
 
+    console.log(auth);
+
     const logout = () => {
         axios.get('/sanctum/csrf-cookie').then(() => {
         auth?.signout().then(() => {
@@ -24,6 +26,7 @@ function GlobalNav(): React.ReactElement {
     }
 
     var AuthButtons: any = null;
+    // var myid: any = auth!.user!.screen_name! ? auth!.user!.screen_name! : "test";
 
     if (!localStorage.getItem('auth_token')){
         AuthButtons = (
@@ -46,7 +49,7 @@ function GlobalNav(): React.ReactElement {
             <React.Fragment>
                 <div>
                     {/* {myid ? <Link to={"/user/" + myid}><span>{myid}</span></Link> : <ReactLoading type="spin" height="20px" width="20px" />} */}
-                    aaaaaaaaa
+                    {/* <div>{auth!.user!.screen_name! ? auth!.user!.screen_name! : "test"}</div> */}
                 </div>
                 <Button variant="contained" onClick={logout}>ログアウト</Button>
             </React.Fragment>
