@@ -51,6 +51,10 @@ function GlobalNav(): React.ReactElement {
                     {/* {myid ? <Link to={"/user/" + myid}><span>{myid}</span></Link> : <ReactLoading type="spin" height="20px" width="20px" />} */}
                     {/* <div>{auth!.user!.screen_name! ? auth!.user!.screen_name! : "test"}</div> */}
                 </div>
+                <Link to="/chat">
+                    <span>Chat</span>
+                </Link>
+                <br/>
                 <Button variant="contained" onClick={logout}>ログアウト</Button>
             </React.Fragment>
         );

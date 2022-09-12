@@ -12,6 +12,7 @@ import GlobalNav from './components/GlobalNav';
 import Register from './pages/Register';
 import Login from './pages/Login';
 import User from './pages/User';
+import Chat from './pages/Chat';
 import Page404 from './pages/Page404';
 import ProvideAuth, { PrivateRoute, PublicRoute } from './AuthContext' //追加
 
@@ -89,6 +90,7 @@ function App(): React.ReactElement {
                         <PublicRoute path='/register' exact><Register/></PublicRoute>
                         <PublicRoute path='/login' exact><Login/></PublicRoute>
                         <Route path='/user/:id' exact component={User} />
+                        <PrivateRoute path='/chat' exact><Chat/></PrivateRoute>
                         <Route path='*' exact component={Page404} />
                     </Switch>
                 </div>
