@@ -7,6 +7,8 @@ use App\Http\Controllers\API\UserController;
 use App\Http\Controllers\API\FollowController;
 use App\Http\Controllers\API\PostController;
 
+use Illuminate\Support\Facades\Broadcast;
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -30,7 +32,10 @@ Route::middleware('auth:sanctum')->group(function() {
     Route::post('follow', [FollowController::class, 'follow']);
     Route::post('unfollow', [FollowController::class, 'unfollow']);
     Route::get('ffcheck', [FollowController::class, 'ffcheck']);
-    Route::post('post', [PostController::class, 'create']);
+    Route::post('post', [PostController::class, 'post']);
+    Route::post('privatepost', [PostController::class, 'privatepost']);
 });
 
 Route::get('getuser', [UserController::class, 'getuser']);
+
+Broadcast::routes(['middleware' => ['auth:sanctum']]);
