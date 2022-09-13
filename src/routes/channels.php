@@ -20,3 +20,9 @@ Broadcast::channel('App.Models.User.{id}', function ($user, $id) {
 Broadcast::channel('post', function (){
     return true;
 });
+
+// https://laracasts.com/discuss/channels/laravel/laravel-echo-server-with-sanctum
+
+Broadcast::channel('privatepost.{id}', function ($user, $id){
+    return (int) $user->id === (int) $id;
+});
