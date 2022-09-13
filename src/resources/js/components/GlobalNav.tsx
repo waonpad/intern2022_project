@@ -55,6 +55,10 @@ function GlobalNav(): React.ReactElement {
                     <span>Chat</span>
                 </Link>
                 <br/>
+                <Link to="/privatechat">
+                    <span>PrivateChat</span>
+                </Link>
+                <br/>
                 <Button variant="contained" onClick={logout}>ログアウト</Button>
             </React.Fragment>
         );
