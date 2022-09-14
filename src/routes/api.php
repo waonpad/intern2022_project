@@ -6,6 +6,7 @@ use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\UserController;
 use App\Http\Controllers\API\FollowController;
 use App\Http\Controllers\API\PostController;
+use App\Http\Controllers\API\PrivatePostController;
 
 use Illuminate\Support\Facades\Broadcast;
 
@@ -33,7 +34,7 @@ Route::middleware('auth:sanctum')->group(function() {
     Route::post('unfollow', [FollowController::class, 'unfollow']);
     Route::get('ffcheck', [FollowController::class, 'ffcheck']);
     Route::post('post', [PostController::class, 'post']);
-    Route::post('privatepost', [PostController::class, 'privatepost']);
+    Route::post('privatepost', [PrivatePostController::class, 'privatePost']);
 });
 
 Route::get('getuser', [UserController::class, 'getuser']);
