@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import swal from "sweetalert";
 import ReactDOM from 'react-dom';
 import { Button, Card } from '@material-ui/core';
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import axios from 'axios';
 import { useForm, SubmitHandler } from "react-hook-form";
 import TextField from '@mui/material/TextField';
@@ -11,6 +11,7 @@ import { LoadingButton } from '@mui/lab';
 import {useAuth} from "../AuthContext";
 
 interface PrivatePostData {
+    disp_user_id: number;
     text: string;
     submit: string;
 }
@@ -25,11 +26,16 @@ function PrivateChat(): React.ReactElement {
 
     const auth = useAuth();
 
+    const {id} = useParams<{id: string}>();
+    const [disp_user_id, setDispUserId] = useState(Number);
+
     const { register, handleSubmit, setError, clearErrors, formState: { errors } } = useForm<PrivatePostData>();
     const [loading, setLoading] = useState(false);
 
     const onSubmit: SubmitHandler<PrivatePostData> = (data: PrivatePostData) => {
         setLoading(true)
+
+        data.disp_user_id = disp_user_id;
 
         axios.get('/sanctum/csrf-cookie').then(() => {
 			axios.post('/api/privatepost', data).then(res => {
@@ -62,10 +68,25 @@ function PrivateChat(): React.ReactElement {
     const [privateposts, setPrivatePosts] = useState(initialState);
 
 	useEffect(() => {
-        window.Echo.private('privatepost.' + auth!.user!.id.toString()).listen('PrivatePosted', (e: any) => {
-            console.log(e);
-            console.log(e.privatepost.text);
-            setPrivatePosts(privateposts => [...privateposts,{text: e.privatepost.text}]);
+        const data = {
+            screen_name: id,
+        };
+
+        axios.get('/api/getuser', {params: data}).then(res => {
+            if (res.status === 200) {
+                setDispUserId(res.data.id);
+                console.log(res);
+
+                const channelname = auth!.user!.id < res.data.id ? auth!.user!.id.toString() + '-' + res.data.id.toString() : res.data.id.toString() + '-' + auth!.user!.id.toString();
+
+                console.log(channelname);
+
+                window.Echo.private('privatepost.' + channelname).listen('PrivatePosted', (e: any) => {
+                    console.log(e);
+                    console.log(e.private_post.text);
+                    setPrivatePosts(privateposts => [...privateposts,{text: e.private_post.text}]);
+                });
+            }
         });
 	}, [])
 
