@@ -92,7 +92,7 @@ function App(): React.ReactElement {
                         <PublicRoute path='/login' exact><Login/></PublicRoute>
                         <Route path='/user/:id' exact component={User} />
                         <PrivateRoute path='/chat' exact><Chat/></PrivateRoute>
-                        <PrivateRoute path='/privatechat' exact><PrivateChat/></PrivateRoute>
+                        <PrivateRoute path='/privatechat/:id' exact><PrivateChat/></PrivateRoute>
                         <Route path='*' exact component={Page404} />
                     </Switch>
                 </div>
