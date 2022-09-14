@@ -23,6 +23,7 @@ Broadcast::channel('post', function (){
 
 // https://laracasts.com/discuss/channels/laravel/laravel-echo-server-with-sanctum
 
-Broadcast::channel('privatepost.{id}', function ($user, $id){
-    return (int) $user->id === (int) $id;
+Broadcast::channel('privatepost.{channelname}', function ($user, $channelname){
+    // return (int) $user->id === (int) $id;
+    return preg_match('/' . $user->id . '/', $channelname);
 });
