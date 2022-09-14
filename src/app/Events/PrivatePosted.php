@@ -1,7 +1,7 @@
 <?php
 namespace App\Events;
 
-use App\Models\Post;
+use App\Models\PrivatePost;
 use App\Models\User;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Broadcasting\Channel;
@@ -15,20 +15,24 @@ class PrivatePosted implements ShouldBroadcast
     use SerializesModels;
 
     /**
-     * @var Post
+     * @var privatePost
      */
-    public $privatepost;
+    public $private_post;
 
     public $user;
 
+    public $disp_user_id;
+
     /**
      * Posted constructor.
-     * @param Post $privatepost
+     * @param PrivatePost $private_post
+     * 
      */
-    public function __construct(Post $privatepost, User $user)
+    public function __construct(PrivatePost $private_post, User $user, $disp_user_id)
     {
-        $this->privatepost = $privatepost;
+        $this->private_post = $private_post;
         $this->user = $user;
+        $this->disp_user_id = $disp_user_id;
     }
 
     /**
@@ -36,6 +40,20 @@ class PrivatePosted implements ShouldBroadcast
      */
     public function broadcastOn()
     {
-        return new PrivateChannel('privatepost.' . $this->user->id);
+        if($this->user->id < $this->disp_user_id) {
+            $channelname = $this->user->id . '-' . $this->disp_user_id;
+        }
+        else {
+            $channelname = $this->disp_user_id . '-' . $this->user->id;
+        }
+
+        return new PrivateChannel('privatepost.' . $channelname);
+    }
+
+    public function broadcastWith()
+    {
+        return [
+            'private_post' => $this->private_post
+        ];
     }
 }
