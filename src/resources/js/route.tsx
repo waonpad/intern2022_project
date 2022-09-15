@@ -14,6 +14,7 @@ import Login from './pages/Login';
 import User from './pages/User';
 import Chat from './pages/Chat';
 import PrivateChat from './pages/PrivateChat';
+import GroupChat from './pages/GroupChat';
 import Page404 from './pages/Page404';
 import ProvideAuth, { PrivateRoute, PublicRoute } from './AuthContext' //追加
 
@@ -93,6 +94,7 @@ function App(): React.ReactElement {
                         <Route path='/user/:id' exact component={User} />
                         <PrivateRoute path='/chat' exact><Chat/></PrivateRoute>
                         <PrivateRoute path='/privatechat/:id' exact><PrivateChat/></PrivateRoute>
+                        <PrivateRoute path='/groupchat/:id' exact><GroupChat/></PrivateRoute>
                         <Route path='*' exact component={Page404} />
                     </Switch>
                 </div>

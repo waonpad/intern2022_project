@@ -47,13 +47,14 @@ class PrivatePosted implements ShouldBroadcast
             $channelname = $this->disp_user_id . '-' . $this->user->id;
         }
 
-        return new PrivateChannel('privatepost.' . $channelname);
+        return new PrivateChannel('private_post.' . $channelname);
     }
 
     public function broadcastWith()
     {
         return [
-            'private_post' => $this->private_post
+            'private_post' => $this->private_post,
+            'user' => $this->user
         ];
     }
 }
