@@ -15,6 +15,51 @@ function GlobalNav(): React.ReactElement {
 
     console.log(auth);
 
+	useEffect(() => {
+        if(auth!.user !== null) {
+            axios.get('/api/notifications').then(res => {
+                if (res.status === 200) {
+                    // setDispUserId(res.data.id);
+                    console.log(res);
+
+                    // setInitialLoad(false);
+                }
+            }).catch((error) => {
+                // console.log(error);
+                // setInitialLoad(false);
+            });
+
+            window.Echo.private('App.Models.User.' + auth!.user!.id)
+            .notification((notification: any) => {
+                console.log(notification);
+            })
+        }
+
+        // readNotification("37d6b77b-ec53-4858-b0e4-ab9eaa5d4e07");
+
+        // readAllNotifications();
+    }, [])
+
+    const readNotification = (notification_id: any) => {
+        axios.post('/api/readnotification', {notification_id: notification_id}).then(res => {
+            if (res.status === 200) {
+                console.log(res);
+            }
+        }).catch((error) => {
+            console.log(error);
+        })
+    }
+
+    const readAllNotifications = () => {
+        axios.post('/api/readallnotifications').then(res => {
+            if (res.status === 200) {
+                console.log(res);
+            }
+        }).catch((error) => {
+            console.log(error);
+        })
+    }
+
     const logout = () => {
         axios.get('/sanctum/csrf-cookie').then(() => {
         auth?.signout().then(() => {
