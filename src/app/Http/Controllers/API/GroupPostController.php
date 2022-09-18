@@ -5,7 +5,10 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\GroupPost;
+use App\Models\Group;
 use App\Events\GroupPosted;
+use App\Notifications\CommonNotification;
+use Illuminate\Support\Facades\Notification;
 
 class GroupPostController extends Controller
 {
@@ -20,6 +23,11 @@ class GroupPostController extends Controller
         ]);
 
         event(new GroupPosted($group_post, $user));
+
+        $group = Group::where('id', $request->group_id)->first();
+        $group_users = $group->groupUsers()->get();
+
+        Notification::send($group_users, new CommonNotification($group_post));
 
         return response()->json([
             'message' => '投稿しました。'
