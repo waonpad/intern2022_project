@@ -10,8 +10,7 @@ use App\Http\Controllers\API\PrivatePostController;
 use App\Http\Controllers\API\GroupController;
 use App\Http\Controllers\API\GroupUserController;
 use App\Http\Controllers\API\GroupPostController;
-
-
+use App\Http\Controllers\API\NotificationController;
 use Illuminate\Support\Facades\Broadcast;
 
 /*
@@ -44,6 +43,10 @@ Route::middleware('auth:sanctum')->group(function() {
     Route::post('joingroup', [GroupUserController::class, 'joinGroup']);
     Route::post('leavegroup', [GroupUserController::class, 'leaveGroup']);
     Route::post('grouppost', [GroupPostController::class, 'groupPost']);
+    Route::get('notifications', [NotificationController::class, 'notifications']);
+    Route::get('unreadnotifications', [NotificationController::class, 'unreadNotifications']);
+    Route::post('readnotification', [NotificationController::class, 'readNotification']);
+    Route::post('readallnotifications', [NotificationController::class, 'readAllNotifications']);
 });
 
 Route::get('getuser', [UserController::class, 'getuser']);
