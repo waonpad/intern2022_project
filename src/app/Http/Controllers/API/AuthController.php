@@ -30,7 +30,9 @@ class AuthController extends Controller
             ]);
         } else if($request->password !== $request->password_confirmation) {
             return response()->json([
-                'message'=>'パスワード不一致',
+                'validation_errors'=>[
+                    'password_confirmation'=>'パスワード不一致',
+                ]
             ]);
         } else {
             $user = User::create([
