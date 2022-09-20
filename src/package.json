@@ -40,7 +40,10 @@
         "typescript": "^4.7.4"
     },
     "dependencies": {
+        "@hookform/resolvers": "^2.6.1",
+        "@material-ui/icons": "^4.11.3",
         "laravel-echo": "^1.14.0",
-        "pusher-js": "^7.4.0"
+        "pusher-js": "^7.4.0",
+        "yup": "^0.32.9"
     }
 }

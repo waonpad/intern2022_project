@@ -38,7 +38,7 @@ function GlobalNav(): React.ReactElement {
         // readNotification("37d6b77b-ec53-4858-b0e4-ab9eaa5d4e07");
 
         // readAllNotifications();
-    }, [])
+    }, [auth!.user])
 
     const readNotification = (notification_id: any) => {
         axios.post('/api/readnotification', {notification_id: notification_id}).then(res => {

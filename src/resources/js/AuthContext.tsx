@@ -78,28 +78,43 @@ const useProvideAuth = () => {
 
 	const register = (registerData: RegisterData) => {
 		return axios.post('/api/register', registerData).then((res) => {
-			localStorage.setItem('auth_token', res.data.token);
-			localStorage.setItem('auth_name', res.data.user.screen_name);
-		axios.get('api/user').then((res) => {
-			setUser(res.data)
-		})
+			console.log(res);
+			if (res.data.status === 200) {
+				localStorage.setItem('auth_token', res.data.token);
+				localStorage.setItem('auth_name', res.data.user.screen_name);
+
+				axios.get('api/user').then((res) => {
+					setUser(res.data)
+				})
+
+				return res;
+			}
+			else {
+				const callback: any = res;
+				return callback;
+			}
 		})
 	}
 
 	const signin = async (loginData: LoginData) => {
-		try {
-		const res = await axios.post('/api/login', loginData).then((res) => {
-			localStorage.setItem('auth_token', res.data.token);
-			localStorage.setItem('auth_name', res.data.user.screen_name);
-		});
-		} catch (error) {
-		throw error;
-		}
+		return axios.post('/api/login', loginData).then((res) => {
+			console.log(res);
+			if (res.data.status === 200) {
+				localStorage.setItem('auth_token', res.data.token);
+				localStorage.setItem('auth_name', res.data.user.screen_name);
 
-		return axios.get('/api/user').then((res) => {
-		setUser(res.data)
-		}).catch((error) => {
-		setUser(null)
+				axios.get('/api/user').then((res) => {
+					setUser(res.data)
+				}).catch((error) => {
+					setUser(null)
+				})
+
+				return res;
+			}
+			else {
+				const callback: any = res;
+				return callback;
+			}
 		})
 	}
 

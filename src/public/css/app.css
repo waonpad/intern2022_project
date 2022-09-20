@@ -10255,3 +10255,7 @@ textarea.form-control-lg {
 a {
   text-decoration: none;
 }
+
+:root {
+  --bs-body-font-family: "Roboto" !important;
+}
