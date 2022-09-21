@@ -8,13 +8,13 @@ import swal from 'sweetalert';
 import Top from './pages/Top';
 import Example from './pages/Example';
 import About from './pages/About';
-import GlobalNav from './components/GlobalNav';
 import Register from './pages/Register';
 import Login from './pages/Login';
 import User from './pages/User';
 import Chat from './pages/Chat';
 import PrivateChat from './pages/PrivateChat';
 import GroupChat from './pages/GroupChat';
+import Header from './components/Header'
 import Page404 from './pages/Page404';
 import ProvideAuth, { PrivateRoute, PublicRoute } from './AuthContext' //追加
 
@@ -83,7 +83,7 @@ function App(): React.ReactElement {
         <ProvideAuth> 
             <BrowserRouter>
                 <div>
-                    <GlobalNav />
+                    <Header />
                     <Switch>
                         {/* ここに、pathと対応するコンポーネントを書いていく */}
                         <Route path='/' exact component={Top} />
