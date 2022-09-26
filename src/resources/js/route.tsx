@@ -82,8 +82,7 @@ function App(): React.ReactElement {
     return (
         <ProvideAuth> 
             <BrowserRouter>
-                <div>
-                    <Header />
+                <Header>
                     <Switch>
                         {/* ここに、pathと対応するコンポーネントを書いていく */}
                         <Route path='/' exact component={Top} />
@@ -97,7 +96,7 @@ function App(): React.ReactElement {
                         <PrivateRoute path='/groupchat/:id' exact><GroupChat/></PrivateRoute>
                         <Route path='*' exact component={Page404} />
                     </Switch>
-                </div>
+                </Header>
             </BrowserRouter>
         </ProvideAuth>
     );

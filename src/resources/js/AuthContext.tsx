@@ -2,6 +2,9 @@ import axios, { AxiosResponse } from "axios";
 import React, {useContext, createContext, useState, ReactNode, useEffect } from "react"
 import ReactLoading from 'react-loading';
 import {Route, Redirect, useHistory} from "react-router-dom"
+import Backdrop from '@material-ui/core/Backdrop';
+import CircularProgress from '@material-ui/core/CircularProgress';
+import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
 
 interface User {
 	id: number
@@ -50,11 +53,23 @@ interface From {
 
 const authContext = createContext<authProps | null>(null)
 
+const useStyles = makeStyles((theme: Theme) =>
+  createStyles({
+    backdrop: {
+      zIndex: theme.zIndex.drawer + 1,
+      color: '#fff',
+    },
+  }),
+);
+
 const ProvideAuth = ({children}: Props) => {
 	const auth = useProvideAuth();
+	const classes = useStyles();
 	if (auth.load) {
 		return (
-			<ReactLoading type="spin" height="100px" width="100px" />
+			<Backdrop className={classes.backdrop} open={true}>
+			  <CircularProgress color="inherit" />
+			</Backdrop>
 		)
 	}
 	else {

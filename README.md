@@ -3,7 +3,7 @@ https://github.com/mariebell/fullstack-project
 
 ## 起動手順
 ```
-make build
+make build (windows)
 ```
 
 ## ホットリロード
