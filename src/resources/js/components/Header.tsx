@@ -1,13 +1,14 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, ReactNode } from 'react';
 import { alpha, makeStyles, Theme, useTheme, createStyles } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import IconButton from '@material-ui/core/IconButton';
 import Typography from '@material-ui/core/Typography';
 import InputBase from '@material-ui/core/InputBase';
-import Badge from '@mui/material/Badge'; // @material-ui/core/だと怒られる
+import { Badge } from '@mui/material'; // @material-ui/core/だと怒られる
 import MenuItem from '@material-ui/core/MenuItem';
 import Menu from '@material-ui/core/Menu';
+import { Home, Chat, Forum, Group, Login, PersonAdd } from '@mui/icons-material';
 import { Settings } from '@material-ui/icons';
 import MenuIcon from '@material-ui/icons/Menu';
 import SearchIcon from '@material-ui/icons/Search';
@@ -34,6 +35,10 @@ import axios from 'axios';
 import swal from 'sweetalert';
 
 import { useAuth } from "../AuthContext";
+
+interface Props {
+  children: ReactNode
+}
 
 const drawerWidth = 240;
 
@@ -146,7 +151,7 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 );
 
-export default function Header() {
+export default function Header({children}: Props) {
 
   // original
   
@@ -303,15 +308,13 @@ export default function Header() {
     >
       <MenuItem onClick={handleMenuClose} component={Link} to={'/login'} style={{ textDecoration: 'none', color: 'inherit' }}>
         <IconButton aria-label="go to login" color="inherit">
-            <MailIcon />
-            {/* 後で変える */}
+            <Login />
         </IconButton>
         <Typography>Login</Typography>
       </MenuItem>
       <MenuItem onClick={handleMenuClose} component={Link} to={'/register'} style={{ textDecoration: 'none', color: 'inherit' }}>
         <IconButton aria-label="go to register" color="inherit">
-            <NotificationsIcon />
-            {/* 後で変える */}
+            <PersonAdd />
         </IconButton>
         <Typography>Register</Typography>
       </MenuItem>
@@ -504,7 +507,25 @@ export default function Header() {
         </div>
         <Divider />
         <List>
-          {['Inbox', 'Starred', 'Send email', 'Drafts'].map((text, index) => (
+          <ListItem button component={Link} to='/' style={{ textDecoration: 'none', color: "inherit" }}>
+            <ListItemIcon><Home /></ListItemIcon>
+            <ListItemText primary='Home'></ListItemText>
+          </ListItem>
+          <ListItem button component={Link} to='/chat' style={{ textDecoration: 'none', color: "inherit" }}>
+            <ListItemIcon><Chat /></ListItemIcon>
+            <ListItemText primary='Chat'></ListItemText>
+          </ListItem>
+          <ListItem button component={Link} to='/privatechat/waonpad' style={{ textDecoration: 'none', color: "inherit" }}>
+            <ListItemIcon><Forum /></ListItemIcon>
+            <ListItemText primary='Private Chat'></ListItemText>
+          </ListItem>
+          <ListItem button component={Link} to='/groupchat/test' style={{ textDecoration: 'none', color: "inherit" }}>
+            <ListItemIcon><Group /></ListItemIcon>
+            <ListItemText primary='Group Chat'></ListItemText>
+          </ListItem>
+
+
+          {/* {['Inbox', 'Starred', 'Send email', 'Drafts'].map((text, index) => (
             <ListItem button key={text}>
               <ListItemIcon>{index % 2 === 0 ? <InboxIcon /> : <MailIcon />}</ListItemIcon>
               <ListItemText primary={text} />
@@ -518,7 +539,7 @@ export default function Header() {
               <ListItemIcon>{index % 2 === 0 ? <InboxIcon /> : <MailIcon />}</ListItemIcon>
               <ListItemText primary={text} />
             </ListItem>
-          ))}
+          ))} */}
         </List>
       </Drawer>
       <main
@@ -527,29 +548,7 @@ export default function Header() {
         })}
       >
         <div className={classes.drawerHeader} />
-        <Typography paragraph>
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt
-          ut labore et dolore magna aliqua. Rhoncus dolor purus non enim praesent elementum
-          facilisis leo vel. Risus at ultrices mi tempus imperdiet. Semper risus in hendrerit
-          gravida rutrum quisque non tellus. Convallis convallis tellus id interdum velit laoreet id
-          donec ultrices. Odio morbi quis commodo odio aenean sed adipiscing. Amet nisl suscipit
-          adipiscing bibendum est ultricies integer quis. Cursus euismod quis viverra nibh cras.
-          Metus vulputate eu scelerisque felis imperdiet proin fermentum leo. Mauris commodo quis
-          imperdiet massa tincidunt. Cras tincidunt lobortis feugiat vivamus at augue. At augue eget
-          arcu dictum varius duis at consectetur lorem. Velit sed ullamcorper morbi tincidunt. Lorem
-          donec massa sapien faucibus et molestie ac.
-        </Typography>
-        <Typography paragraph>
-          Consequat mauris nunc congue nisi vitae suscipit. Fringilla est ullamcorper eget nulla
-          facilisi etiam dignissim diam. Pulvinar elementum integer enim neque volutpat ac
-          tincidunt. Ornare suspendisse sed nisi lacus sed viverra tellus. Purus sit amet volutpat
-          consequat mauris. Elementum eu facilisis sed odio morbi. Euismod lacinia at quis risus sed
-          vulputate odio. Morbi tincidunt ornare massa eget egestas purus viverra accumsan in. In
-          hendrerit gravida rutrum quisque non tellus orci ac. Pellentesque nec nam aliquam sem et
-          tortor. Habitant morbi tristique senectus et. Adipiscing elit duis tristique sollicitudin
-          nibh sit. Ornare aenean euismod elementum nisi quis eleifend. Commodo viverra maecenas
-          accumsan lacus vel facilisis. Nulla posuere sollicitudin aliquam ultrices sagittis orci a.
-        </Typography>
+        {children}
       </main>
       {renderMobileMenu}
       {renderMenu}
