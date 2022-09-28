@@ -71,15 +71,13 @@ Route::middleware('auth:sanctum')->group(function() {
 
     
     // Wordles
-    Route::post('wordle/create', [WordleController::class, 'create']);
+    Route::post('wordle/upsert', [WordleController::class, 'upsert']);
     Route::get('wordle/show', [WordleController::class, 'show']);
-    Route::post('wordle/update', [WordleController::class, 'update']);
     Route::post('wordle/destroy', [WordleController::class, 'destroy']);
     Route::get('wordle/search', [WordleController::class, 'search']);
 
     // comments
-    Route::post('comment/create', [CommentController::class, 'create']);
-    Route::post('comment/update', [CommentController::class, 'update']);
+    Route::post('comment/upsert', [CommentController::class, 'upsert']);
     Route::post('comment/destroy', [CommentController::class, 'destroy']);
 
     // games

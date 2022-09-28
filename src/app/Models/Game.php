@@ -11,9 +11,25 @@ class Game extends Model
 
     protected $fillable = [
         'wordle_id',
+        'name',
+        'user_id',
+        'words',
+        'min',
+        'max',
+        'input',
+        'description',
         'answer',
         'entry_limit',
         'status'
+    ];
+
+    protected $hedden = [
+        'answer'
+    ];
+    
+    protected $casts = [
+        'words' => 'array',
+        'input' => 'array'
     ];
 
     public function gameUsers()

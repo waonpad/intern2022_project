@@ -15,4 +15,8 @@ class GameLog extends Model
         'type',
         'log'
     ];
+
+    protected $casts = [
+        'log' => 'array',
+    ];
 }
