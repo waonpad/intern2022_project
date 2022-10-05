@@ -15,18 +15,18 @@ return new class extends Migration
     {
         Schema::create('games', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('wordle_id');
+            $table->unsignedBigInteger('wordle_id')->nullable();
             $table->foreign('wordle_id')->references('id')->on('wordles')->nullOnDelete();
             $table->string('name');
-            $table->unsignedBigInteger('user_id');
+            $table->unsignedBigInteger('user_id')->nullable();
             $table->foreign('user_id')->references('id')->on('users')->nullOnDelete();
             $table->json('words');
-            $table->int('min');
-            $table->int('max');
+            $table->integer('min');
+            $table->integer('max');
             $table->json('input');
-            $table->string('description');
+            $table->string('description')->nullable();
             $table->string('answer');
-            $table->int('entry_limit');
+            $table->integer('entry_limit');
             $table->string('status');
             $table->timestamps();
         });

@@ -143,6 +143,12 @@ class GameController extends Controller
     {
         // 参加ユーザーのうち、一番古いユーザーであればホストとしてゲームを開始できる
         if (GameUser::where('game_id', $request->game_id)->where('status', '!=', 'leave')->first()->user_id === $request->user()->id) {
+
+            // ゲームを開始状態にする
+            Game::find($request->game_id)->update([
+                'status'=>'start'
+            ]);
+
             // 参加ユーザー全員を開始状態にする
             $game_users = GameUser::where('game_id', $request->game_id)->where('status', '!=', 'leave')->update([
                 'status'=>'start'
@@ -223,11 +229,41 @@ class GameController extends Controller
                 array_push($errata, 0);
             }
         }
-        
 
         // 入力が答えと一致していたら
         if ($request->input === $game->answer) {
-            // 
+            // 入力通知
+            GameLog::create([
+                'game_id'=>$request->game_id,
+                'user_id'=>$request->user()->id,
+                'type'=>'input',
+                'log'=>[
+                    'correct'=>true,
+                    'exists'=>$exists,
+                    'matchs'=>$matchs,
+                    'input'=>$input,
+                    'errata'=>$errata,
+                ]
+            ]);
+
+            // ゲームを終了状態にする
+            Game::find($request->game_id)->update([
+                'status'=>'end'
+            ]);
+
+            // 参加ユーザー全員を終了状態にする
+            GameUser::where('game_id', $request->game_id)->where('status', '!=', 'start')->update([
+                'status'=>'end'
+            ]);
+
+            // 終了通知
+            GameLog::create([
+                'game_id'=>$request->game_id,
+                'type'=>'end',
+                'log'=>[
+                    'winner'=>$request->user()->id,
+                ]
+            ]);
         }
         else {
             // 入力通知

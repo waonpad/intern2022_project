@@ -86,6 +86,7 @@ class WordleController extends Controller
             'tags'=>$tags,
             'created_at'=>$wordle->created_at,
             'updated_at'=>$wordle->updated_at,
+            'status'=>200
         ]);
     }
     
@@ -131,7 +132,8 @@ class WordleController extends Controller
         }
 
         return response()->json([
-            'wordles'=>$datas
+            'wordles'=>$datas,
+            'status'=>200
         ]);
     }
 }
