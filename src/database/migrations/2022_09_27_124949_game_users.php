@@ -15,13 +15,13 @@ return new class extends Migration
     {
         Schema::create('game_users', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('game_id');
+            $table->unsignedBigInteger('game_id')->nullable();
             $table->foreign('game_id')->references('id')->on('games')->nullOnDelete();
-            $table->unsignedBigInteger('user_id');
+            $table->unsignedBigInteger('user_id')->nullable();
             $table->foreign('user_id')->references('id')->on('users')->nullOnDelete();
             $table->string('status');
-            $table->int('order');
-            $table->int('result');
+            $table->integer('order')->nullable();
+            $table->integer('result')->nullable();
             $table->timestamps();
         });
     }

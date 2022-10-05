@@ -82,5 +82,5 @@ middleware-%:
 optimize:
 	docker-compose exec ${APP_CONTAINER} php artisan optimize
 
-evt:
+evt-%:
 	docker-compose exec ${APP_CONTAINER} php artisan make:event ${@:evt-%=%}

@@ -16,11 +16,11 @@ return new class extends Migration
         Schema::create('wordles', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->unsignedBigInteger('user_id');
+            $table->unsignedBigInteger('user_id')->nullable();
             $table->foreign('user_id')->references('id')->on('users')->nullOnDelete(); // https://readouble.com/laravel/8.x/ja/migrations.html
             $table->json('words'); // https://note.com/note_fumi/n/n618f7800a2e1
             $table->json('input');
-            $table->string('description');
+            $table->string('description')->nullable();
             $table->timestamps();
         });
     }
