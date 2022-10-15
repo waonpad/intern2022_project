@@ -40,20 +40,18 @@ function GroupChat(): React.ReactElement {
 
         data.group_id = group_id;
 
-        axios.get('/sanctum/csrf-cookie').then(() => {
-			axios.post('/api/grouppost', data).then(res => {
-				swal("送信成功", "送信成功", "success");
-                console.log(res);
-			  	setLoading(false);
-			}).catch(error => {
-			  	console.log(error)
-			  	setError('submit', {
-				type: 'manual',
-				message: '送信に失敗しました'
-			})
-			  	setLoading(false);
-			})
-		})
+        axios.post('/api/grouppost', data).then(res => {
+            swal("送信成功", "送信成功", "success");
+            console.log(res);
+            setLoading(false);
+        }).catch(error => {
+            console.log(error)
+            setError('submit', {
+            type: 'manual',
+            message: '送信に失敗しました'
+        })
+            setLoading(false);
+        })
     }
 
     const initialState = [

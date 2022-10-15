@@ -9,7 +9,8 @@
       "jsx": "react"
     },
     "exclude": [
-        "vendor"
+      "vendor",
+      "node_modules"
     ],
     "$schema": "https://json.schemastore.org/tsconfig",
     "display": "Recommended"
