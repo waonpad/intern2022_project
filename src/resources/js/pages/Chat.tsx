@@ -27,20 +27,18 @@ function Chat(): React.ReactElement {
     const onSubmit: SubmitHandler<PostData> = (data: PostData) => {
         setLoading(true)
 
-        axios.get('/sanctum/csrf-cookie').then(() => {
-			axios.post('/api/post', data).then(res => {
-				swal("送信成功", "送信成功", "success");
-                console.log(res);
-			  	setLoading(false);
-			}).catch(error => {
-			  	console.log(error)
-			  	setError('submit', {
-				type: 'manual',
-				message: '送信に失敗しました'
-			})
-			  	setLoading(false);
-			})
-		})
+        axios.post('/api/post', data).then(res => {
+            swal("送信成功", "送信成功", "success");
+            console.log(res);
+            setLoading(false);
+        }).catch(error => {
+            console.log(error)
+            setError('submit', {
+            type: 'manual',
+            message: '送信に失敗しました'
+        })
+            setLoading(false);
+        })
     }
 
     const initialState = [

@@ -40,20 +40,18 @@ function PrivateChat(): React.ReactElement {
 
         data.disp_user_id = disp_user_id;
 
-        axios.get('/sanctum/csrf-cookie').then(() => {
-			axios.post('/api/privatepost', data).then(res => {
-				swal("送信成功", "送信成功", "success");
-                console.log(res);
-			  	setLoading(false);
-			}).catch(error => {
-			  	console.log(error)
-			  	setError('submit', {
-				type: 'manual',
-				message: '送信に失敗しました'
-			})
-			  	setLoading(false);
-			})
-		})
+        axios.post('/api/privatepost', data).then(res => {
+            swal("送信成功", "送信成功", "success");
+            console.log(res);
+            setLoading(false);
+        }).catch(error => {
+            console.log(error)
+            setError('submit', {
+            type: 'manual',
+            message: '送信に失敗しました'
+        })
+            setLoading(false);
+        })
     }
 
     const initialState = [
