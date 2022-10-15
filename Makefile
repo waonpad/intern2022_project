@@ -86,8 +86,8 @@ evt-%:
 	docker-compose exec ${APP_CONTAINER} php artisan make:event ${@:evt-%=%}
 
 
-rmdir-mui-chips-input-node-modules:
-	rmdir src\node_modules\mui-chips-input\node_modules
+rm-mui-chips-input-node-modules:
+	docker-compose exec ${APP_CONTAINER} rm -rf node_modules/mui-chips-input/node_modules
 
 acs:
 	docker container  exec -it fullstack-app /bin/ash
