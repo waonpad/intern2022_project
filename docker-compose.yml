@@ -15,6 +15,8 @@ services:
     volumes:
       - ./docker/php/php.ini:/usr/local/php/php.ini
       - ./src:/var/www/html
+      - vendor-store:/var/www/html/vendor
+      - node_modules-store:/var/www/html/node_modules
 
   db:
     container_name: fullstack-db
@@ -43,4 +45,6 @@ services:
       - PMA_PASSWORD=password
 
 volumes:
+  vendor-store:
+  node_modules-store:
   fullstack-db-volume:
