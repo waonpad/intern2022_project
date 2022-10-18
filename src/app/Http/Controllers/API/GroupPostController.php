@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Notification;
 
 class GroupPostController extends Controller
 {
-    public function groupPost(Request $request)
+    public function post(Request $request)
     {
         $user = $request->user();
 

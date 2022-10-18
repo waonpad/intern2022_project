@@ -162,7 +162,7 @@ export default function Header({children}: Props) {
 
 	useEffect(() => {
     if(auth!.user !== null) {
-        axios.get('/api/unreadnotifications').then(res => {
+        axios.get('/api/notification/unread').then(res => {
             if (res.status === 200) {
                 console.log(res);
                 setUnreadNotifications(res.data.unread_notifications);
@@ -188,7 +188,7 @@ export default function Header({children}: Props) {
 
 
   const readNotification = (notification_id: any) => {
-    axios.post('/api/readnotification', {notification_id: notification_id}).then(res => {
+    axios.post('/api/notification/read', {notification_id: notification_id}).then(res => {
         if (res.status === 200) {
             console.log(res);
         }
@@ -198,7 +198,7 @@ export default function Header({children}: Props) {
   }
 
   const readAllNotifications = () => {
-    axios.post('/api/readallnotifications').then(res => {
+    axios.post('/api/notifications/readall').then(res => {
         if (res.status === 200) {
             console.log(res);
         }

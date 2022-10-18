@@ -9,21 +9,6 @@ use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
-
-    public function getuser(Request $request)
-    {
-        $user = User::where('screen_name', $request->screen_name)->first();
-
-        return response()->json([
-            'id'=>$user->id,
-            'screen_name'=>$user->screen_name,
-            'name'=>$user->name,
-            'email'=>$user->email,
-            'created_at'=>$user->created_at,
-            // 'password'=>$user->password,
-        ]);
-    }
-
     /**
      * Display a listing of the resource.
      *
@@ -48,12 +33,21 @@ class UserController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
+     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
-    {
-        //
+    public function show(Request $request)
+    {   
+        $user = User::where('screen_name', $request->screen_name)->first();
+
+        return response()->json([
+            'id'=>$user->id,
+            'screen_name'=>$user->screen_name,
+            'name'=>$user->name,
+            'email'=>$user->email,
+            'created_at'=>$user->created_at,
+            // 'password'=>$user->password,
+        ]);
     }
 
     /**

@@ -54,7 +54,7 @@ function User(): React.ReactElement {
     };
 
     useEffect(() => {
-        axios.get('/api/getuser', {params: data}).then(res => {
+        axios.get('/api/user/show', {params: data}).then(res => {
             if (res.status === 200) {
                 setUserData(res.data);
                 console.log(res);

@@ -40,7 +40,7 @@ function GroupChat(): React.ReactElement {
 
         data.group_id = group_id;
 
-        axios.post('/api/grouppost', data).then(res => {
+        axios.post('/api/group/post', data).then(res => {
             swal("送信成功", "送信成功", "success");
             console.log(res);
             setLoading(false);
@@ -74,7 +74,7 @@ function GroupChat(): React.ReactElement {
             screen_name: id
         };
 
-        axios.get('/api/getgroup', {params: data}).then(res => {
+        axios.get('/api/group/show', {params: data}).then(res => {
             if (res.status === 200) {
                 setGroupId(res.data.id);
                 console.log(res);

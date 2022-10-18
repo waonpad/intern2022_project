@@ -12,4 +12,9 @@ class Tag extends Model
     protected $fillable = [
         'name'
     ];
+
+    public function wordles()
+    {
+        return $this->belongsToMany('App\Models\Wordle', 'wordle_tag', 'tag_id', 'wordle_id');
+    }
 }

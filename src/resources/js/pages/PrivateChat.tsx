@@ -74,7 +74,7 @@ function PrivateChat(): React.ReactElement {
             screen_name: id
         };
 
-        axios.get('/api/getuser', {params: data}).then(res => {
+        axios.get('/api/user/show', {params: data}).then(res => {
             if (res.status === 200) {
                 setDispUserId(res.data.id);
                 console.log(res);
