@@ -8,7 +8,7 @@ use App\Models\Group;
 
 class GroupController extends Controller
 {
-    public function getGroup(Request $request)
+    public function show(Request $request)
     {
         $group = Group::where('screen_name', $request->screen_name)->first();
         $group_users = $group->groupUsers()->get();

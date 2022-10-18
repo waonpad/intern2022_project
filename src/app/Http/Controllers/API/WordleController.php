@@ -35,6 +35,7 @@ class WordleController extends Controller
                 'validation_errors'=>$validator->errors(),
             ]);
         } else {
+            // CAUTION:updateOrCreateは戻り値に真偽値しか返さないので後ろでエラーが起きる
             $wordle = Wordle::updateOrCreate(
                 ['id'=>$request->wordle_id],
                 [
@@ -45,9 +46,6 @@ class WordleController extends Controller
                     'description'=>$request->description,
                 ]
             );
-            
-            // 付けられているタグが変わる可能性が有る為、一度関連付けを削除する
-            WordleTag::where('wordle_id', $request->wordle_id)->delete();
 
             foreach ($request->tags as $tag) {
                 // タグが無ければ作成する(既にあってもupdateされてしまう)
@@ -57,13 +55,9 @@ class WordleController extends Controller
                         'name'=>$tag
                     ]
                 );
-
-                // 関連付け
-                WordleTag::create([
-                    'wordle_tag'=>$request->wordle_id,
-                    'tag_id'=>$tag_upsert->id,
-                ]);
             }
+            
+            $wordle->tags()->sync();
 
             return response()->json([
                 'status'=>200

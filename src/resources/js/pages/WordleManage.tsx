@@ -33,8 +33,9 @@ import CloseIcon from '@material-ui/icons/Close';
 import Chip from '@mui/material/Chip';
 import Autocomplete from '@mui/material/Autocomplete';
 import Stack from '@mui/material/Stack';
+import Hidden from '@mui/material/Hidden';
 import {useAuth} from "../AuthContext";
-import { MuiChipsInput } from 'mui-chips-input';
+import { MuiChipsInput, MuiChipsInputChip } from 'mui-chips-input';
 import Backdrop from '@material-ui/core/Backdrop';
 import CircularProgress from '@material-ui/core/CircularProgress';
 
@@ -73,11 +74,11 @@ const theme = createTheme();
 function WordleManage(): React.ReactElement {
 
     const basicSchema = Yup.object().shape({
-        // name: Yup.string().max(50).required(),
+        name: Yup.string().max(50).required(),
         words: Yup.array().min(10).of(Yup.string().min(5).max(10)), // 要調整
         input: Yup.array().min(1).of(Yup.string()),
-        // description: Yup.string().max(255),
-        // tags: Yup.array().of(Yup.string().max(50)), // tagsの中にバリデーションをかける方法が分からない
+        description: Yup.string().max(255),
+        // tagsはMuiChipsInputでバリデーションしている
     });
 
     const auth = useAuth();
@@ -98,10 +99,10 @@ function WordleManage(): React.ReactElement {
     const [loading, setLoading] = useState(false);
     
     // Tags /////////////////////////////////////////////////////////////
-    const [tags, setTags] = useState(Array);
+    const [tags, setTags] = useState<MuiChipsInputChip[]>([]);
 
     // 更新画面の初期表示時にタグを入れる処理を追加しないといけない
-    const handleSelecetedTags = (selectedItem: any) => {
+    const handleSelecetedTags = (selectedItem: MuiChipsInputChip[]) => {
         setTags(selectedItem);
     }
     //////////////////////////////////////////////////////////////////////
@@ -175,17 +176,17 @@ function WordleManage(): React.ReactElement {
 
     // Submit ////////////////////////////////////////////////////////////////////
     const onSubmit: SubmitHandler<WordleData> = (data: WordleData) => {
-        // console.log(input);
-        // data.input = input;
+        console.log(tags);
+        data.tags = tags;
         console.log(data);
-        setLoading(true)
+        setLoading(true);
 
-        axios.post('/api/wordle/null', data).then(res => {
+        axios.post('/api/wordle/upsert', data).then(res => {
             console.log(res);
             if (res.data.status === 200) {
-                // swal("Success", "登録成功", "success");
+                swal("Success", "登録成功", "success");
                 // setTimeout((() => {history.push('/')}), 4000);
-                // setLoading(false)
+                setLoading(false)
             }
             else {
                 const obj: WordleErrorData = res.data.validation_errors;
@@ -265,9 +266,6 @@ function WordleManage(): React.ReactElement {
                             alignItems: 'center',
                         }}
                         >
-                        {/* <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
-                            <LockOutlinedIcon />
-                        </Avatar> */}
                         <Typography component="h1" variant="h5">
                             Wordle {wordle_id ? 'Manage' : 'Create'}
                         </Typography>
@@ -293,42 +291,47 @@ function WordleManage(): React.ReactElement {
                                         fullWidth
                                         variant='outlined'
                                         id='tags'
-                                        name='tags'
+                                        // name='tags'
                                         label='Tags'
                                         placeholder=''
                                         aria-multiline
                                         maxRows={10}
-                                        error={errors.tags ? true : false}
-                                        helperText={errors.tags?.message}
+                                        validate={(chipValue) => {
+                                            return {
+                                                isError: chipValue.length > 50,
+                                                textError: 'the value must be at least 50 characters long'
+                                            }
+                                        }}
                                     />
+                                    <FormHelperText sx={{mt: 1, ml: 2}}>Double click to edit a tag</FormHelperText>
                                 </Grid>
                                 <FormControl sx={{ m: 3 }} component="fieldset" variant="standard">
                                     <FormLabel component="legend">Using Language Set</FormLabel>
                                     <FormGroup>
-                                    <FormControlLabel
-                                        control={
-                                        <Checkbox value='japanese' checked={japanese} {...register('input')} onChange={handleInputChange} id="japanese"/>
-                                        }
-                                        label="Japanese"
-                                    />
-                                    <FormControlLabel
-                                        control={
-                                        <Checkbox value='english' checked={english} {...register('input')} onChange={handleInputChange} id="english"/>
-                                        }
-                                        label="English"
-                                    />
-                                    <FormControlLabel
-                                        control={
-                                        <Checkbox value='number' checked={number} {...register('input')} onChange={handleInputChange} id="number"/>
-                                        }
-                                        label="Number"
-                                    />
-                                    <FormControlLabel
-                                        control={
-                                        <Checkbox value='typing' checked={typing} {...register('input')} onChange={handleInputChange} id="typing"/>
-                                        }
-                                        label="Typing"
-                                    />
+                                        <FormControlLabel
+                                            control={
+                                            <Checkbox value='japanese' checked={japanese} {...register('input')} onChange={handleInputChange} id="japanese"/>
+                                            }
+                                            label="Japanese"
+                                        />
+                                        <FormControlLabel
+                                            control={
+                                            <Checkbox value='english' checked={english} {...register('input')} onChange={handleInputChange} id="english"/>
+                                            }
+                                            label="English"
+                                        />
+                                        <FormControlLabel
+                                            control={
+                                            <Checkbox value='number' checked={number} {...register('input')} onChange={handleInputChange} id="number"/>
+                                            }
+                                            label="Number"
+                                        />
+                                        <FormControlLabel
+                                            control={
+                                            <Checkbox value='typing' checked={typing} {...register('input')} onChange={handleInputChange} id="typing"/>
+                                            }
+                                            label="Typing"
+                                        />
                                     </FormGroup>
                                     <FormHelperText sx={{color: '#f6685e'}}>{errors.input?.message}</FormHelperText>
                                 </FormControl>
@@ -347,7 +350,7 @@ function WordleManage(): React.ReactElement {
                                 </Grid>
                                 <Grid container spacing={2} item xs={12}>
                                     {words}
-                                    <FormHelperText sx={{color: '#f6685e'}}>{errors.words?.message}</FormHelperText>
+                                    {/* <FormHelperText sx={{color: '#f6685e'}}>{errors.words?.message}</FormHelperText> */}
                                 </Grid>
                             </Grid>
                             <LoadingButton

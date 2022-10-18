@@ -8,7 +8,7 @@ use Illuminate\Notifications\DatabaseNotification;
 
 class NotificationController extends Controller
 {
-    public function notifications(Request $request)
+    public function index(Request $request)
     {
         $notifications = $request->user()->Notifications()->get();
 
@@ -17,7 +17,7 @@ class NotificationController extends Controller
         ]);
     }
 
-    public function unreadNotifications(Request $request)
+    public function unread(Request $request)
     {
         $unread_notifications = $request->user()->unreadNotifications()->get();
 
@@ -26,7 +26,7 @@ class NotificationController extends Controller
         ]);
     }
 
-    public function readNotification(Request $request)
+    public function read(Request $request)
     {
         $notification = DatabaseNotification::find($request->notification_id);
 
@@ -37,7 +37,7 @@ class NotificationController extends Controller
         ]);
     }
 
-    public function readAllNotifications(Request $request)
+    public function readAll(Request $request)
     {
         $request->user()->unreadNotifications->markAsRead();
 

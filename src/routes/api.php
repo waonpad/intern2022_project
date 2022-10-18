@@ -8,7 +8,7 @@ use App\Http\Controllers\API\FollowController;
 use App\Http\Controllers\API\PostController;
 use App\Http\Controllers\API\PrivatePostController;
 use App\Http\Controllers\API\GroupController;
-use App\Http\Controllers\API\GroupUserController;
+// use App\Http\Controllers\API\GroupUserController;
 use App\Http\Controllers\API\GroupPostController;
 use App\Http\Controllers\API\NotificationController;
 use App\Http\Controllers\API\WordleController;
@@ -38,8 +38,10 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::post('register', [AuthController::class, 'register']);
 Route::post('login', [AuthController::class, 'login']);
 
-// ユーザー情報
-Route::get('getuser', [UserController::class, 'getuser']);
+// ユーザー
+Route::prefix('user')->group(function (){
+    Route::get('/show', [UserController::class, 'show']);
+});
 
 // ログイン中のみ使用可能 ///////////////////////////////////
 Route::middleware('auth:sanctum')->group(function() {
@@ -57,36 +59,46 @@ Route::middleware('auth:sanctum')->group(function() {
     Route::post('privatepost', [PrivatePostController::class, 'privatePost']);
 
     // グループ
-    Route::get('getgroup', [GroupController::class, 'getGroup']);
-    Route::post('creategroup', [GroupController::class, 'createGroup']);
-    Route::post('joingroup', [GroupUserController::class, 'joinGroup']);
-    Route::post('leavegroup', [GroupUserController::class, 'leaveGroup']);
-    Route::post('grouppost', [GroupPostController::class, 'groupPost']);
+    Route::prefix('group')->group(function (){
+        Route::get('/show', [GroupController::class, 'show']);
+        Route::post('/create', [GroupController::class, 'create']);
+        // Route::post('/join', [GroupUserController::class, 'join']);
+        // Route::post('/leave', [GroupUserController::class, 'leave']);
+        Route::post('/post', [GroupPostController::class, 'post']);
+    });
 
     // 通知
-    Route::get('notifications', [NotificationController::class, 'notifications']);
-    Route::get('unreadnotifications', [NotificationController::class, 'unreadNotifications']);
-    Route::post('readnotification', [NotificationController::class, 'readNotification']);
-    Route::post('readallnotifications', [NotificationController::class, 'readAllNotifications']);
+    Route::prefix('notification')->group(function (){
+        Route::get('/index', [NotificationController::class, 'index']);
+        Route::get('/unread', [NotificationController::class, 'unread']);
+        Route::post('/read', [NotificationController::class, 'read']);
+        Route::post('/readall', [NotificationController::class, 'readAll']);
+    });
 
     
     // Wordles
-    Route::post('wordle/upsert', [WordleController::class, 'upsert']);
-    Route::get('wordle/show', [WordleController::class, 'show']);
-    Route::post('wordle/destroy', [WordleController::class, 'destroy']);
-    Route::get('wordle/search', [WordleController::class, 'search']);
+    Route::prefix('wordle')->group(function (){
+        Route::post('upsert', [WordleController::class, 'upsert']);
+        Route::get('show', [WordleController::class, 'show']);
+        Route::post('destroy', [WordleController::class, 'destroy']);
+        Route::get('search', [WordleController::class, 'search']);
 
-    // comments
-    Route::post('comment/upsert', [CommentController::class, 'upsert']);
-    Route::post('comment/destroy', [CommentController::class, 'destroy']);
+        // comments
+        Route::prefix('comment')->group(function (){
+            Route::post('upsert', [CommentController::class, 'upsert']);
+            Route::post('destroy', [CommentController::class, 'destroy']);
+        });
 
-    // games
-    Route::post('game/create', [GameController::class, 'create']);
-    Route::get('game/show', [GameController::class, 'show']);
-    Route::get('game/search', [GameController::class, 'search']);
-    Route::post('game/entry', [GameController::class, 'entry']);
-    Route::post('game/leave', [GameController::class, 'leave']);
-    Route::post('game/ready', [GameController::class, 'ready']);
-    Route::post('game/start', [GameController::class, 'start']);
-    Route::post('game/input', [GameController::class, 'input']);
+        // games
+        Route::prefix('game')->group(function (){
+            Route::post('create', [GameController::class, 'create']);
+            Route::get('show', [GameController::class, 'show']);
+            Route::get('search', [GameController::class, 'search']);
+            Route::post('entry', [GameController::class, 'entry']);
+            Route::post('leave', [GameController::class, 'leave']);
+            Route::post('ready', [GameController::class, 'ready']);
+            Route::post('start', [GameController::class, 'start']);
+            Route::post('input', [GameController::class, 'input']);
+        });
+    });
 });
