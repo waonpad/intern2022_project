@@ -37,7 +37,7 @@ interface authProps {
 	register: (registerData: RegisterData) => Promise<void>
 	signin: (loginData: LoginData) => Promise<void>;
 	signout: () => Promise<void>;
-	saveProfile: (formData: FormData | ProfileData) => Promise<void>;
+	// saveProfile: (formData: FormData | ProfileData) => Promise<void>;
 }
 interface Props {
   	children: ReactNode
@@ -94,7 +94,7 @@ const useProvideAuth = () => {
 	const register = (registerData: RegisterData) => {
 		return axios.post('/api/register', registerData).then((res) => {
 			console.log(res);
-			if (res.data.status === 200) {
+			if (res.data.status === true) {
 				localStorage.setItem('auth_token', res.data.token);
 				localStorage.setItem('auth_name', res.data.user.screen_name);
 
@@ -114,7 +114,7 @@ const useProvideAuth = () => {
 	const signin = async (loginData: LoginData) => {
 		return axios.post('/api/login', loginData).then((res) => {
 			console.log(res);
-			if (res.data.status === 200) {
+			if (res.data.status === true) {
 				localStorage.setItem('auth_token', res.data.token);
 				localStorage.setItem('auth_name', res.data.user.screen_name);
 
@@ -141,23 +141,23 @@ const useProvideAuth = () => {
 		})
 	}
 
-	const saveProfile = async (formData: FormData | ProfileData) => {
-		const res = await axios.post(
-		'/api/user/profile-information', 
-		formData, 
-		{headers: {'X-HTTP-Method-Override': 'PUT'}}
-		)
-		.catch((error) => {
-		throw error;
-		})
-		if(res?.status == 200) {
-		return axios.get('/api/user').then((res) => {
-			setUser(res.data)
-		}).catch((error) => {
-			setUser(null)
-		})
-		}
-	}
+	// const saveProfile = async (formData: FormData | ProfileData) => {
+	// 	const res = await axios.post(
+	// 	'/api/user/profile-information', 
+	// 	formData, 
+	// 	{headers: {'X-HTTP-Method-Override': 'PUT'}}
+	// 	)
+	// 	.catch((error) => {
+	// 	throw error;
+	// 	})
+	// 	if(res?.status == 200) {
+	// 	return axios.get('/api/user').then((res) => {
+	// 		setUser(res.data)
+	// 	}).catch((error) => {
+	// 		setUser(null)
+	// 	})
+	// 	}
+	// }
 
 	useEffect(() => {
 		axios.get('/api/user').then((res) => {
@@ -174,7 +174,7 @@ const useProvideAuth = () => {
 		register,
 		signin,
 		signout,
-		saveProfile,
+		// saveProfile,
 		load
 	}
 }

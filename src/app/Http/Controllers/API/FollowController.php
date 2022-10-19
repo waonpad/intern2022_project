@@ -10,47 +10,23 @@ use App\Notifications\CommonNotification;
 
 class FollowController extends Controller
 {
-    public function follow(Request $request) {
+    
+    public function followToggle(Request $request) {
         $user = $request->user();
-        // https://programmierfrage.com/items/laravel-error-call-to-undefined-method-stdclassnotify-in-laravel-8
+        $target_user = User::where('screen_name', $request->screen_name)->first();
 
-        $followed_user = User::where('screen_name', $request->screen_name)->first();
-
-        $exist = Follow::where('following_user_id', $user->id)->where('followed_user_id', $followed_user->id)->first();
-
-        if($exist == null) {
-            $follow = Follow::create([
-                'following_user_id' => $user->id,
-                'followed_user_id' => $followed_user->id,
-            ]);
-            // $followCount = count(Follow::where('followed_user_id', $request->id)->get());
-            // return response()->json(['followCount' => $followCount]);
-
-            $followed_user->notify(new CommonNotification($follow));
-            return response()->json(['status' => true]);
+        $toggle_result = $user->follows()->toggle($target_user->id);
+        if(in_array($target_user->id, $toggle_result['attached'])) {
+            $follow_status = true;
         }
-        else {
-            return response()->json(['status' => false]);
+        else if(in_array($target_user->id, $toggle_result['detached'])) {
+            $follow_status = false;
         }
-    }
 
-    public function unfollow(Request $request) {
-        $user = $request->user();
-
-        $followed_user = User::where('screen_name', $request->screen_name)->first()->id;
-        
-        $exist = Follow::where('following_user_id', $user->id)->where('followed_user_id', $followed_user->id)->first();
-
-        if($exist == null) {
-            return response()->json(['status' => false]);
-        }
-        else {
-            $follow = Follow::where('following_user_id', $user->id)->where('followed_user_id', $followed_user->id)->first();
-            $follow->delete();
-            // $followCount = count(Follow::where('followed_user_id', $request->id)->get());
-            // return response()->json(['followCount' => $followCount]);
-            return response()->json(['status' => true]);
-        }
+        return response()->json([
+            'status' => true,
+            'follow_status' => $follow_status,
+        ]);
     }
 
     public function ffcheck(Request $request) {
