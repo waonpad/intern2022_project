@@ -5,16 +5,13 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Comment;
-use Illuminate\Support\Facades\Validator;
+use App\Http\Requests\UpsertCommentRequest;
 
 class CommentController extends Controller
 {
-    public function upsert(Request $request)
+    public function upsert(UpsertCommentRequest $request)
     {
-        $validator = Validator::make($request->all(), [
-            'comment'=>'required|max:16384'
-        ]);
-
+        $validator = $request->getValidator();
         if($validator->fails()){
             return response()->json([
                 'validation_errors'=>$validator->errors(),
@@ -33,7 +30,7 @@ class CommentController extends Controller
             // ページに通知する処理を後から作る
 
             return response()->json([
-                'status'=>200
+                'status'=>true
             ]);
         }
     }

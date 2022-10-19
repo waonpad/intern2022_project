@@ -5,39 +5,20 @@ import { Button, Card } from '@material-ui/core';
 import { Link, useParams } from "react-router-dom";
 import axios from 'axios';
 
-// https://fullstacklife.net/programming/typescript/react-router-get-url-param-ts/
-
 function User(): React.ReactElement {
 
     // 表示中のユーザーのid
     const {id} = useParams<{id: string}>();
 
-    const [FollowButton, setFollowButton] = useState(<ReactLoading type="spin" height="20px" width="20px" />);
+    const [loading, setLoading] = useState(true);
+    const [followStatus, setFollowStatus] = useState(false);
+    const [myself, setMyself] = useState(false);
 
-    const follow = () => {
-        axios.post('/api/follow', {screen_name: id}).then(res => {
+    const followToggle = () => {
+        axios.post('/api/followtoggle', {screen_name: id}).then(res => {
             if(res.data.status === true) {
                 console.log(res);
-                
-                setFollowButton((
-                    <React.Fragment>
-                        <Button onClick={unfollow}>UnFollow</Button>
-                    </React.Fragment>
-                ))
-            }
-        })
-    }
-
-    const unfollow = () => {
-        axios.post('/api/unfollow', {screen_name: id}).then(res => {
-            if(res.data.status === true) {
-                console.log(res);
-                
-                setFollowButton((
-                    <React.Fragment>
-                        <Button onClick={follow}>Follow</Button>
-                    </React.Fragment>
-                ))
+                setFollowStatus(res.data.follow_status);
             }
         })
     }
@@ -62,39 +43,16 @@ function User(): React.ReactElement {
         });
         
         if (!localStorage.getItem('auth_token')){
-            setFollowButton((
-                <React.Fragment>
-                    <Button onClick={follow}>Follow</Button>
-                </React.Fragment>
-            ))
+            setFollowStatus(false);
+            setLoading(false);
         }
         else {
             axios.get('/api/ffcheck', {params: {screen_name: id}}).then(res => {
                 if(res.status === 200) {
                     console.log(res);
-                    
-                    // 表示中のユーザーが自分であるか フォローしているかしていないか
-                    if(res.data.myself === true) {
-                        setFollowButton((
-                            <React.Fragment>
-                                <Button>Edit Profile</Button>
-                            </React.Fragment>
-                        ))
-                    }
-                    else if(res.data.follow === true) {
-                        setFollowButton((
-                            <React.Fragment>
-                                <Button onClick={unfollow}>UnFollow</Button>
-                            </React.Fragment>
-                        ))
-                    }
-                    else if(res.data.follow === false) {
-                        setFollowButton((
-                            <React.Fragment>
-                                <Button onClick={follow}>Follow</Button>
-                            </React.Fragment>
-                        ))
-                    }
+                    setMyself(res.data.myself);
+                    setFollowStatus(res.data.follow);
+                    setLoading(false);
                 }
             })
         }
@@ -103,7 +61,16 @@ function User(): React.ReactElement {
     return (
         <React.Fragment>
             <h1>User:{id}</h1>
-            {FollowButton}<br />
+            {   
+                loading ? (
+                    <ReactLoading type="spin" height="20px" width="20px" />
+                ) :
+                myself ? (
+                    <Button>Edit Profile</Button>
+                ) : (
+                    <Button onClick={followToggle}>{followStatus ? 'unFollow' : 'Follow'}</Button>
+                )
+            }<br />
             {userData.screen_name ? <span>{userData.screen_name}</span> : <ReactLoading type="spin" height="20px" width="20px" />}<br />
             {userData.name ? <span>{userData.name}</span> : <ReactLoading type="spin" height="20px" width="20px" />}<br />
             {userData.email ? <span>{userData.email}</span> : <ReactLoading type="spin" height="20px" width="20px" />}<br />

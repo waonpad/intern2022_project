@@ -183,7 +183,7 @@ function WordleManage(): React.ReactElement {
 
         axios.post('/api/wordle/upsert', data).then(res => {
             console.log(res);
-            if (res.data.status === 200) {
+            if (res.data.status === true) {
                 swal("Success", "登録成功", "success");
                 // setTimeout((() => {history.push('/')}), 4000);
                 setLoading(false)
@@ -218,7 +218,7 @@ function WordleManage(): React.ReactElement {
             console.log(wordle_id);
             axios.get('/api/wordle/show',  {params: {wordle_id: wordle_id}}).then(res => {
                 console.log(res);
-                if (res.data.status === 200) {
+                if (res.data.status === true) {
                     setWordleDefaultData(res.data);
     
                     setInitialLoad(false)

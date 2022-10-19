@@ -50,8 +50,9 @@ Route::middleware('auth:sanctum')->group(function() {
     Route::post('logout', [AuthController::class, 'logout']);
 
     // フォロー
-    Route::post('follow', [FollowController::class, 'follow']);
-    Route::post('unfollow', [FollowController::class, 'unfollow']);
+    Route::post('followtoggle', [FollowController::class, 'followToggle']);
+    // Route::post('follow', [FollowController::class, 'follow']);
+    // Route::post('unfollow', [FollowController::class, 'unfollow']);
     Route::get('ffcheck', [FollowController::class, 'ffcheck']);
 
     // 投稿

@@ -76,7 +76,7 @@ function GroupChat(): React.ReactElement {
 
         axios.get('/api/group/show', {params: data}).then(res => {
             if (res.status === 200) {
-                setGroupId(res.data.id);
+                setGroupId(res.data.group.id);
                 console.log(res);
 
                 console.log(res.data.id);

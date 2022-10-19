@@ -100,7 +100,7 @@ export default function Register(): React.ReactElement {
     axios.get('/sanctum/csrf-cookie').then(() => {
         auth?.register(data).then((res: any) => {
           console.log(res);
-          if (res.data.status === 200) {
+          if (res.data.status === true) {
             // swal("Success", "登録成功", "success");
             // setTimeout((() => {history.push('/')}), 4000);
             // setLoading(false)

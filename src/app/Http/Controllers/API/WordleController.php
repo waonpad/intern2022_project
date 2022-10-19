@@ -7,35 +7,18 @@ use Illuminate\Http\Request;
 use App\Models\Wordle;
 use App\Models\Tag;
 use App\Models\WordleTag;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Validation\Rule;
+use App\Http\Requests\UpsertWordleRequest;
 
 class WordleController extends Controller
 {
-    public function upsert(Request $request)
+    public function upsert(UpsertWordleRequest $request)
     {
-        $validator = Validator::make($request->all(), [
-            // https://qiita.com/hamakou108/items/bc17b46afa8476235d33
-
-            'name'=>'required|max:50',
-            'words'=>'required|array',
-            'words.*'=>'string|min:5|max:10',
-            'input'=>'required|array',
-            'input.*'=>[
-                'string|',
-                Rule::in(['japanese', 'english', 'number', 'typing'])
-            ],
-            'description'=>'max:255',
-            'tags'=>'array',
-            'tags.*'=>'max:50',
-        ]);
-
+        $validator = $request->getValidator();
         if($validator->fails()){
             return response()->json([
-                'validation_errors'=>$validator->errors(),
+                'validation_errors' => $validator->errors(),
             ]);
         } else {
-            // CAUTION:updateOrCreateは戻り値に真偽値しか返さないので後ろでエラーが起きる
             $wordle = Wordle::updateOrCreate(
                 ['id'=>$request->wordle_id],
                 [
@@ -47,40 +30,32 @@ class WordleController extends Controller
                 ]
             );
 
+            $tag_id_array = [];
             foreach ($request->tags as $tag) {
-                // タグが無ければ作成する(既にあってもupdateされてしまう)
-                $tag_upsert = Tag::updateOrCreate(
+                $target_tag_id = Tag::firstOrCreate(
                     ['name'=>$tag],
                     [
                         'name'=>$tag
                     ]
-                );
+                )->id;
+                array_push($tag_id_array, $target_tag_id);
             }
             
-            $wordle->tags()->sync();
+            $wordle->tags()->sync($tag_id_array);
 
             return response()->json([
-                'status'=>200
+                'status' => true
             ]);
         }
     }
     
     public function show(Request $request)
     {
-        $wordle = Wordle::find($request->wordle_id);
-        $tags = $wordle->tags()->get();
+        $wordle = Wordle::with('tags')->find($request->wordle_id);
 
         return response()->json([
-            'id'=>$wordle->id,
-            'name'=>$wordle->name,
-            'user_id'=>$wordle->user_id,
-            'words'=>$wordle->words,
-            'input'=>$wordle->input,
-            'description'=>$wordle->description,
-            'tags'=>$tags,
-            'created_at'=>$wordle->created_at,
-            'updated_at'=>$wordle->updated_at,
-            'status'=>200
+            'wordle' => $wordle,
+            'status' => true
         ]);
     }
     
@@ -92,42 +67,24 @@ class WordleController extends Controller
             Wordle::destroy($wordle->id);
 
             return response()->json([
-                'status'=>200
+                'status' => true
             ]);
         }
         else {
             return response()->json([
-               'message'=>'Wordleが存在しないか削除権限が無い' 
+               'message' => 'Wordleが存在しないか削除権限が無い',
+               'status' => true
             ]);
         }
     }
     
     public function search(Request $request)
     {
-        $wordles = Wordle::where('user_id', $request->user()->id)->get();
-
-        $datas = [];
-
-        foreach ($wordles as $wordle) {
-            $tags = $wordle->tags()->get();
-            $data = [
-                'id'=>$wordle->id,
-                'name'=>$wordle->name,
-                'user_id'=>$wordle->user_id,
-                'words'=>$wordle->words,
-                'input'=>$wordle->input,
-                'description'=>$wordle->description,
-                'tags'=>$tags,
-                'created_at'=>$wordle->created_at,
-                'updated_at'=>$wordle->updated_at,
-            ];
-
-            array_push($datas, $data);
-        }
+        $wordles = Wordle::where('user_id', $request->user()->id)->with('tags')->get();
 
         return response()->json([
-            'wordles'=>$datas,
-            'status'=>200
+            'wordles' => $wordles,
+            'status' => true
         ]);
     }
 }

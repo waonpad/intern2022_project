@@ -212,6 +212,7 @@ export default function Header({children}: Props) {
     auth?.signout().then(() => {
         swal("ログアウトしました", "ログアウト成功", "success");
         history.push('/');
+        location.reload();
     })
     })
   }
