@@ -23,6 +23,8 @@ class FollowController extends Controller
             $follow_status = false;
         }
 
+        // 通知を送る
+
         return response()->json([
             'status' => true,
             'follow_status' => $follow_status,
@@ -30,12 +32,21 @@ class FollowController extends Controller
     }
 
     public function ffcheck(Request $request) {
-        $id = User::where('screen_name', $request->screen_name)->first()->id;
-        $follow = Follow::where('following_user_id', $request->user()->id)->where('followed_user_id', $id)->first();
-        $followed = Follow::where('following_user_id', $id)->where('followed_user_id', $request->user()->id)->first();
+        $user = $request->user() ?? null;
+        if ($user === null) {
+            return response()->json([
+                'myself' => false,
+                'follow' => false,
+                'followed' => false,
+            ]);
+        }
+
+        $target_user = User::where('screen_name', $request->screen_name)->first();
+        $follow = Follow::where('following_user_id', $user->id)->where('followed_user_id', $target_user->id)->first();
+        $followed = Follow::where('following_user_id', $target_user->id)->where('followed_user_id', $user->id)->first();
 
         return response()->json([
-            'myself' => $request->user()->id == $id ? true : false,
+            'myself' => $user->id == $id ? true : false,
             'follow' => $follow ? true : false,
             'followed' => $followed ? true : false,
         ]);
