@@ -75,31 +75,4 @@ Route::middleware('auth:sanctum')->group(function() {
         Route::post('/read', [NotificationController::class, 'read']);
         Route::post('/readall', [NotificationController::class, 'readAll']);
     });
-
-    
-    // Wordles
-    Route::prefix('wordle')->group(function (){
-        Route::post('upsert', [WordleController::class, 'upsert']);
-        Route::get('show', [WordleController::class, 'show']);
-        Route::post('destroy', [WordleController::class, 'destroy']);
-        Route::get('search', [WordleController::class, 'search']);
-
-        // comments
-        Route::prefix('comment')->group(function (){
-            Route::post('upsert', [CommentController::class, 'upsert']);
-            Route::post('destroy', [CommentController::class, 'destroy']);
-        });
-
-        // games
-        Route::prefix('game')->group(function (){
-            Route::post('create', [GameController::class, 'create']);
-            Route::get('show', [GameController::class, 'show']);
-            Route::get('search', [GameController::class, 'search']);
-            Route::post('entry', [GameController::class, 'entry']);
-            Route::post('leave', [GameController::class, 'leave']);
-            Route::post('ready', [GameController::class, 'ready']);
-            Route::post('start', [GameController::class, 'start']);
-            Route::post('input', [GameController::class, 'input']);
-        });
-    });
 });
