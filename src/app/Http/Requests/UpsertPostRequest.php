@@ -3,9 +3,8 @@ namespace App\Http\Requests;
 
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 
-class UpsertWordleRequest extends FormRequest
+class LoginRequest extends FormRequest
 {
 
     /**
@@ -16,17 +15,11 @@ class UpsertWordleRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => 'required|max:50',
-            'words' => 'required|array',
-            'words.*' => 'string|min:5|max:10',
-            'input' => 'required|array',
-            'input.*' => [
-                'string|',
-                Rule::in(['japanese', 'english', 'number', 'typing'])
-            ],
-            'description' => 'max:255',
-            'tags' => 'array',
-            'tags.*' => 'max:50',
+            'title' => 'required|max:50',
+            'comment' => 'required',
+            'categories' => 'array',
+            'categories.*' => 'int',
+            'new_category' => 'max:50'
         ];
     }
 

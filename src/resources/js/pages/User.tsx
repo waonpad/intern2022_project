@@ -37,25 +37,13 @@ function User(): React.ReactElement {
     useEffect(() => {
         axios.get('/api/user/show', {params: data}).then(res => {
             if (res.status === 200) {
-                setUserData(res.data);
+                setUserData(res.data.user);
+                setMyself(res.data.ffcheck.myself);
+                setFollowStatus(res.data.ffcheck.follow);
+                setLoading(false);
                 console.log(res);
             }
         });
-        
-        if (!localStorage.getItem('auth_token')){
-            setFollowStatus(false);
-            setLoading(false);
-        }
-        else {
-            axios.get('/api/ffcheck', {params: {screen_name: id}}).then(res => {
-                if(res.status === 200) {
-                    console.log(res);
-                    setMyself(res.data.myself);
-                    setFollowStatus(res.data.follow);
-                    setLoading(false);
-                }
-            })
-        }
     }, [])
 
     return (

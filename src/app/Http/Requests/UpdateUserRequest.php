@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 
-class UpsertCommentRequest extends FormRequest
+class UpdateUserRequest extends FormRequest
 {
 
     /**
@@ -15,7 +15,10 @@ class UpsertCommentRequest extends FormRequest
     public function rules()
     {
         return [
-            'comment' => 'required|max:16384'
+            'name' => 'required|string|max:255',
+            'description'=> 'string|max:255',
+            'age' => 'numeric|min:0|max:130',
+            'gender' => ['string', Rule::in(['male', 'female'])],
         ];
     }
 

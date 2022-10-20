@@ -16,18 +16,12 @@ class UserController extends Controller
      */
     public function index()
     {
-        //
-    }
+        $users = User::get();
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        //
+        return response()->json([
+            'status' => true,
+            'users' => $users,
+        ]);
     }
 
     /**
@@ -40,13 +34,13 @@ class UserController extends Controller
     {   
         $user = User::where('screen_name', $request->screen_name)->first();
 
+        $follow_controller = app()->make('App\Http\Controllers\API\FollowController');
+        $ffcheck = $follow_controller->ffcheck($request->screen_name);
+
         return response()->json([
-            'id'=>$user->id,
-            'screen_name'=>$user->screen_name,
-            'name'=>$user->name,
-            'email'=>$user->email,
-            'created_at'=>$user->created_at,
-            // 'password'=>$user->password,
+            'status' => true,
+            'user' => $user,
+            'ffcheck' => $ffcheck
         ]);
     }
 
@@ -57,19 +51,20 @@ class UserController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request)
     {
-        //
-    }
+        $user = $request->user();
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        //
+        $user->update([
+            'name' => $request['name'],
+            'description' => $request['description'],
+            'age' => $request['age'],
+            'gender' => $request['gender']
+        ])
+
+        return response()->json([
+            'status' => true,
+            'user' => $user
+        ])
     }
 }
