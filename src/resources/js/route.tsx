@@ -94,7 +94,6 @@ function App(): React.ReactElement {
                         <PrivateRoute path='/chat' exact><Chat/></PrivateRoute>
                         <PrivateRoute path='/privatechat/:id' exact><PrivateChat/></PrivateRoute>
                         <PrivateRoute path='/groupchat/:id' exact><GroupChat/></PrivateRoute>
-                        <Route path='/search' exact component={Search} />
                         <Route path='*' exact component={Page404} />
                     </Switch>
                 </Header>

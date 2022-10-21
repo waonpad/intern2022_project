@@ -32,15 +32,25 @@ class UserController extends Controller
      */
     public function show(Request $request)
     {   
-        $user = User::where('screen_name', $request->screen_name)->first();
+        $auth_user = Auth::user() ?? '';
+        $target_user = User::with(['followers', 'follows', 'posts', 'likes'])->where('screen_name', $request->screen_name)->first();
 
-        $follow_controller = app()->make('App\Http\Controllers\API\FollowController');
-        $ffcheck = $follow_controller->ffcheck($request->screen_name);
+        // $myself = ($auth_user->id === $target_user->id) ? true : false;
+        // $follow = in_array($auth_user->id, $target_user->followers->pluck('id')->toArray()) ? true : false;
+        // $followed = in_array($auth_user->id, $target_user->follows->pluck('id')->toArray()) ? true : false;
+        // $myself = ($auth_user->id === $target_user->id) ? true : false;
+        // $follow = in_array($auth_user->id, array_column(array($target_user->followers), 'id')) ? true : false;
+        // $followed = in_array($auth_user->id, array_column(array($target_user->follows), 'id')) ? true : false;
+
+        // CAUTION データが取れない
 
         return response()->json([
             'status' => true,
-            'user' => $user,
-            'ffcheck' => $ffcheck
+            'user' => $target_user,
+            'auth_user' => $auth_user
+            // 'myself' => $myself,
+            // 'follow' => $follow,
+            // 'followed' => $followed
         ]);
     }
 
@@ -60,11 +70,11 @@ class UserController extends Controller
             'description' => $request['description'],
             'age' => $request['age'],
             'gender' => $request['gender']
-        ])
+        ]);
 
         return response()->json([
             'status' => true,
             'user' => $user
-        ])
+        ]);
     }
 }
