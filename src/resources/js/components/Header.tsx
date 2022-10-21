@@ -161,7 +161,7 @@ export default function Header({children}: Props) {
   const [unread_notifications, setUnreadNotifications] = useState<any>();
 
 	useEffect(() => {
-    if(auth!.user !== null) {
+    if(auth?.user !== null) {
         axios.get('/api/notification/unread').then(res => {
             if (res.status === 200) {
                 console.log(res);
@@ -174,7 +174,7 @@ export default function Header({children}: Props) {
             // setInitialLoad(false);
         });
 
-        window.Echo.private('App.Models.User.' + auth!.user!.id)
+        window.Echo.private('App.Models.User.' + auth?.user?.id)
         .notification((notification: any) => {
             console.log(notification);
             setUnreadNotifications([...unread_notifications, notification]);
@@ -184,7 +184,7 @@ export default function Header({children}: Props) {
     // readNotification("37d6b77b-ec53-4858-b0e4-ab9eaa5d4e07");
 
     // readAllNotifications();
-  }, [auth!.user])
+  }, [auth?.user])
 
 
   const readNotification = (notification_id: any) => {
@@ -208,12 +208,10 @@ export default function Header({children}: Props) {
   }
 
   const logout = () => {
-    axios.get('/sanctum/csrf-cookie').then(() => {
     auth?.signout().then(() => {
         swal("ログアウトしました", "ログアウト成功", "success");
         history.push('/');
         location.reload();
-    })
     })
   }
 
@@ -296,7 +294,7 @@ export default function Header({children}: Props) {
   );
 
   const mobileMenuId = 'primary-search-account-menu-mobile';
-  const renderMobileMenu = !localStorage.getItem('auth_token') ? (
+  const renderMobileMenu = !auth?.user ? (
     // ログインしていない
     <Menu
       anchorEl={mobileMoreAnchorEl}
@@ -358,7 +356,7 @@ export default function Header({children}: Props) {
         </IconButton>
         <Typography>Notifications</Typography>
       </MenuItem>
-      <MenuItem aria-label='go to current user' component={Link} to={'/user/' + auth!.user!.screen_name} style={{ textDecoration: 'none', color: "inherit" }}>
+      <MenuItem aria-label='go to current user' component={Link} to={'/user/' + auth?.user!.screen_name} style={{ textDecoration: 'none', color: "inherit" }}>
         <IconButton color="inherit">
           <AccountCircle />
         </IconButton>
@@ -414,7 +412,7 @@ export default function Header({children}: Props) {
           </div>
           <div className={classes.grow} />
 
-          {!localStorage.getItem('auth_token') ? (
+          {!auth?.user ? (
             // ログインしていない
             <div className={classes.sectionDesktop}>
                 <Button component={Link} to='/login' style={{ textDecoration: 'none', color: 'inherit' }}>Login</Button>
@@ -447,7 +445,7 @@ export default function Header({children}: Props) {
                 </Badge>
               </IconButton>
 
-              <IconButton aria-label='go to current user' component={Link} to={'/user/' + auth!.user!.screen_name} style={{ textDecoration: 'none', color: "inherit" }}>
+              <IconButton aria-label='go to current user' component={Link} to={'/user/' + auth?.user!.screen_name} style={{ textDecoration: 'none', color: "inherit" }}>
                 <AccountCircle />
               </IconButton>
 

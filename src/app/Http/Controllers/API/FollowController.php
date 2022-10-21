@@ -31,7 +31,7 @@ class FollowController extends Controller
         ]);
     }
 
-    public function ffcheck(Request $request) {
+    public function ffcheck($request) {
         $user = $request->user() ?? null;
         if ($user === null) {
             return response()->json([

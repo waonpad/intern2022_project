@@ -27,7 +27,9 @@ function User(): React.ReactElement {
         screen_name: '',
         name: '',
         email: '',
-        password: '',
+        description: '',
+        age: '',
+        gender: ''
     });
 
     const data = {
@@ -37,11 +39,11 @@ function User(): React.ReactElement {
     useEffect(() => {
         axios.get('/api/user/show', {params: data}).then(res => {
             if (res.status === 200) {
-                setUserData(res.data.user);
-                setMyself(res.data.ffcheck.myself);
-                setFollowStatus(res.data.ffcheck.follow);
-                setLoading(false);
                 console.log(res);
+                setUserData(res.data.user);
+                setMyself(res.data.myself);
+                setFollowStatus(res.data.follow);
+                setLoading(false);
             }
         });
     }, [])
@@ -62,7 +64,9 @@ function User(): React.ReactElement {
             {userData.screen_name ? <span>{userData.screen_name}</span> : <ReactLoading type="spin" height="20px" width="20px" />}<br />
             {userData.name ? <span>{userData.name}</span> : <ReactLoading type="spin" height="20px" width="20px" />}<br />
             {userData.email ? <span>{userData.email}</span> : <ReactLoading type="spin" height="20px" width="20px" />}<br />
-            {userData.password ? <span>{userData.password}</span> : <ReactLoading type="spin" height="20px" width="20px" />}<br />
+            {userData.description ? <span>{userData.description}</span> : <ReactLoading type="spin" height="20px" width="20px" />}<br />
+            {userData.age ? <span>{userData.age}</span> : <ReactLoading type="spin" height="20px" width="20px" />}<br />
+            {userData.gender ? <span>{userData.gender}</span> : <ReactLoading type="spin" height="20px" width="20px" />}<br />
         </React.Fragment>
     );
 }

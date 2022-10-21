@@ -1,6 +1,5 @@
 import axios, { AxiosResponse } from "axios";
 import React, {useContext, createContext, useState, ReactNode, useEffect } from "react"
-import ReactLoading from 'react-loading';
 import {Route, Redirect, useHistory} from "react-router-dom"
 import Backdrop from '@material-ui/core/Backdrop';
 import CircularProgress from '@material-ui/core/CircularProgress';
@@ -28,16 +27,11 @@ interface RegisterData {
 	password: string,
 	password_confirmation: string,
 }
-interface ProfileData {
-	name?: string,
-	email?: string
-}
 interface authProps {
 	user: User | null;
 	register: (registerData: RegisterData) => Promise<void>
 	signin: (loginData: LoginData) => Promise<void>;
 	signout: () => Promise<void>;
-	// saveProfile: (formData: FormData | ProfileData) => Promise<void>;
 }
 interface Props {
   	children: ReactNode
@@ -65,6 +59,7 @@ const useStyles = makeStyles((theme: Theme) =>
 const ProvideAuth = ({children}: Props) => {
 	const auth = useProvideAuth();
 	const classes = useStyles();
+    console.log(auth?.user);
 	if (auth.load) {
 		return (
 			<Backdrop className={classes.backdrop} open={true}>
@@ -95,13 +90,7 @@ const useProvideAuth = () => {
 		return axios.post('/api/register', registerData).then((res) => {
 			console.log(res);
 			if (res.data.status === true) {
-				localStorage.setItem('auth_token', res.data.token);
-				localStorage.setItem('auth_name', res.data.user.screen_name);
-
-				axios.get('api/user').then((res) => {
-					setUser(res.data)
-				})
-
+				setUser(res.data.user);
 				return res;
 			}
 			else {
@@ -115,15 +104,7 @@ const useProvideAuth = () => {
 		return axios.post('/api/login', loginData).then((res) => {
 			console.log(res);
 			if (res.data.status === true) {
-				localStorage.setItem('auth_token', res.data.token);
-				localStorage.setItem('auth_name', res.data.user.screen_name);
-
-				axios.get('/api/user').then((res) => {
-					setUser(res.data)
-				}).catch((error) => {
-					setUser(null)
-				})
-
+				setUser(res.data.user);
 				return res;
 			}
 			else {
@@ -136,35 +117,17 @@ const useProvideAuth = () => {
 	const signout = () => {
 		return axios.post('/api/logout', {}).then(() => {
 		setUser(null)
-		localStorage.removeItem('auth_token');
-		localStorage.removeItem('auth_name');
 		})
 	}
-
-	// const saveProfile = async (formData: FormData | ProfileData) => {
-	// 	const res = await axios.post(
-	// 	'/api/user/profile-information', 
-	// 	formData, 
-	// 	{headers: {'X-HTTP-Method-Override': 'PUT'}}
-	// 	)
-	// 	.catch((error) => {
-	// 	throw error;
-	// 	})
-	// 	if(res?.status == 200) {
-	// 	return axios.get('/api/user').then((res) => {
-	// 		setUser(res.data)
-	// 	}).catch((error) => {
-	// 		setUser(null)
-	// 	})
-	// 	}
-	// }
 
 	useEffect(() => {
 		axios.get('/api/user').then((res) => {
 		setUser(res.data)
+        console.log('ログイン済み');
 		setLoad(false)
 		}).catch((error) => {
 		setUser(null)
+        console.log('ログインしていない');
 		setLoad(false)
 		})
 	}, [])
@@ -174,7 +137,6 @@ const useProvideAuth = () => {
 		register,
 		signin,
 		signout,
-		// saveProfile,
 		load
 	}
 }

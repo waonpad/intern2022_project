@@ -46,6 +46,11 @@ Route::prefix('user')->group(function (){
 // ログイン中のみ使用可能 ///////////////////////////////////
 Route::middleware('auth:sanctum')->group(function() {
 
+    // ユーザー
+    Route::prefix('user')->group(function (){
+        Route::get('/update', [UserController::class, 'update']);
+    });
+
     // ログアウト
     Route::post('logout', [AuthController::class, 'logout']);
 

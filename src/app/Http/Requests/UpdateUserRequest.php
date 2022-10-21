@@ -15,10 +15,10 @@ class UpdateUserRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => 'required|string|max:255',
-            'description'=> 'string|max:255',
-            'age' => 'numeric|min:0|max:130',
-            'gender' => ['string', Rule::in(['male', 'female'])],
+            'name' => 'required|string|max:191',
+            'description' => 'nullable|string|max:191',
+            'age' => 'required|numeric|min:0|max:130',
+            'gender' => 'required|string|in:male,female',
         ];
     }
 

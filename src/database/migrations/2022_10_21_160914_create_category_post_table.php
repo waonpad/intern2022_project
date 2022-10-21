@@ -14,7 +14,7 @@ class CreateCategoryPostTable extends Migration
     public function up()
     {
         Schema::create('category_post', function (Blueprint $table) {
-            // ToDo: category_postテーブル(中間テーブル)のベースを作成
+            $table->id();
             $table->unsignedBigInteger('category_id');
             $table->unsignedBigInteger('post_id');
             $table->foreign('category_id')->references('id')->on('categories')->onDelete('cascade');
