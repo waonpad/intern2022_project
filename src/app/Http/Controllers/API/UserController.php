@@ -35,22 +35,17 @@ class UserController extends Controller
         $auth_user = Auth::user() ?? '';
         $target_user = User::with(['followers', 'follows', 'posts', 'likes'])->where('screen_name', $request->screen_name)->first();
 
-        // $myself = ($auth_user->id === $target_user->id) ? true : false;
-        // $follow = in_array($auth_user->id, $target_user->followers->pluck('id')->toArray()) ? true : false;
-        // $followed = in_array($auth_user->id, $target_user->follows->pluck('id')->toArray()) ? true : false;
-        // $myself = ($auth_user->id === $target_user->id) ? true : false;
-        // $follow = in_array($auth_user->id, array_column(array($target_user->followers), 'id')) ? true : false;
-        // $followed = in_array($auth_user->id, array_column(array($target_user->follows), 'id')) ? true : false;
-
-        // CAUTION データが取れない
+        $myself = ($auth_user->id === $target_user->id) ? true : false;
+        $follow = in_array($auth_user->id, $target_user->followers->pluck('id')->toArray()) ? true : false;
+        $followed = in_array($auth_user->id, $target_user->follows->pluck('id')->toArray()) ? true : false;
 
         return response()->json([
             'status' => true,
             'user' => $target_user,
-            'auth_user' => $auth_user
-            // 'myself' => $myself,
-            // 'follow' => $follow,
-            // 'followed' => $followed
+            'auth_user' => $auth_user,
+            'myself' => $myself,
+            'follow' => $follow,
+            'followed' => $followed
         ]);
     }
 
