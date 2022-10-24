@@ -22,7 +22,7 @@ class Posted implements ShouldBroadcast
      * Posted constructor.
      * @param Post $post
      */
-    public function __construct(Post $post)
+    public function __construct($post)
     {
         $this->post = $post;
     }

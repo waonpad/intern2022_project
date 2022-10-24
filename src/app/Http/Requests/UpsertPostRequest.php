@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 
-class LoginRequest extends FormRequest
+class UpsertPostRequest extends FormRequest
 {
 
     /**
@@ -18,8 +18,7 @@ class LoginRequest extends FormRequest
             'title' => 'required|max:50',
             'comment' => 'required',
             'categories' => 'array',
-            'categories.*' => 'int',
-            'new_category' => 'max:50'
+            'categories.*' => 'string',
         ];
     }
 

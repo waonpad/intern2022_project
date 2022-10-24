@@ -6,18 +6,26 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use App\Events\Posted;
 use App\Models\Post;
+use App\Models\Category;
 use Illuminate\Http\Request;
 use App\Http\Requests\UpsertPostRequest;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Database\Eloquent\Builder;
 
 class PostController extends Controller
 {
+
     public function index()
     {
-        $posts = Post::get();
+        $posts = Post::with('categories', 'user', 'likes')->get();
+
+        foreach($posts as $post) {
+            $post['like_status'] = in_array(Auth::id(), $post->likes->pluck('id')->toArray());
+        };
 
         return response()->json([
             'status' => true,
-            'post' => $posts
+            'posts' => $posts
         ]);
     }
 
@@ -28,74 +36,79 @@ class PostController extends Controller
                 'validation_errors' => $validator->errors(),
             ]);
         } else {
-            $user = $request->user();
+            $user = Auth::user();
         
-            $post = Post::updateOrCreate([
-                'title' => $request->title,
-                'comment' => $request->comment,
-                'user_id' => $user->id
-            ]);
+            $post = Post::updateOrCreate(
+                ['id' => $request->post_id],
+                [
+                    'title' => $request->title,
+                    'comment' => $request->comment,
+                    'user_id' => $user->id
+                ]
+            );
 
-            $category_id_array = [];
-            foreach ($request->categoriess as $category) {
-                $target_category_id = Tag::firstOrCreate(
+            $sync_categories = [];
+            foreach ($request->categories as $category) {
+                $target_category = Category::firstOrCreate(
                     ['name'=>$category],
                     [
                         'name'=>$category
                     ]
-                )->id;
-                array_push($category_id_array, $target_category_id);
+                );
+                array_push($sync_categories, $target_category);
             }
 
-            $post->categories->sync($category_id_array);
+            $post->categories()->sync(array_column($sync_categories, 'id'));
+            $response_post = Post::with('categories', 'user', 'likeUsers')->find($post->id);
 
             event(new Posted($post));
 
             return response()->json([
                 'status' => true,
-                'message' => '投稿しました。'
+                'message' => '投稿しました。',
+                'post' => $response_post
             ]);
         }
+    }
         
-        public function show(Request $request)
-        {
-            $post = Post::find($request->post_id);
+    public function show(Request $request)
+    {
+        $post = Post::find($request->post_id);
+
+        return response()->json([
+            'status' => true,
+            'post' => $post
+        ]);
+    }
+
+    public function destroy(Request $request)
+    {
+        $post = Post::find($request->post_id);
+        
+        if ($post->user_id === $request->user()->id) {
+            Post::destroy($post->id);
+
+            // 削除イベントを送信する
 
             return response()->json([
-                'status' => true,
-                'post' => $post
+                'status' => true
             ]);
         }
-
-        public function destroy(Request $request)
-        {
-            $post = Post::find($request->post_id);
-            
-            if ($post->user_id === $request->user()->id) {
-                Post::destroy($post->id);
-
-                // 削除イベントを送信する
-    
-                return response()->json([
-                    'status' => true
-                ]);
-            }
-            else {
-                return response()->json([
-                    'status' => false,
-                    'message' => 'Postが存在しないか削除権限が無い'
-                ]);
-            }
-        }
-
-        public function search(Request $request)
-        {
-            $posts = Post::where('user_id', $request->user()->id)->get();
-    
+        else {
             return response()->json([
-                'status' => true,
-                'posts' => $posts
+                'status' => false,
+                'message' => 'Postが存在しないか削除権限が無い'
             ]);
         }
+    }
+
+    public function search(Request $request)
+    {
+        $posts = Post::where('user_id', $request->user()->id)->get();
+
+        return response()->json([
+            'status' => true,
+            'posts' => $posts
+        ]);
     }
 }
