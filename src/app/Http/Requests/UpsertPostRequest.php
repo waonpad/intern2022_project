@@ -15,6 +15,7 @@ class UpsertPostRequest extends FormRequest
     public function rules()
     {
         return [
+            'id' => 'integer|nullable',
             'title' => 'required|max:50',
             'comment' => 'required',
             'categories' => 'array',

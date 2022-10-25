@@ -39,7 +39,7 @@ class PostController extends Controller
             $user = Auth::user();
         
             $post = Post::updateOrCreate(
-                ['id' => $request->post_id],
+                ['id' => $request->id],
                 [
                     'title' => $request->title,
                     'comment' => $request->comment,
@@ -59,9 +59,10 @@ class PostController extends Controller
             }
 
             $post->categories()->sync(array_column($sync_categories, 'id'));
-            $response_post = Post::with('categories', 'user', 'likeUsers')->find($post->id);
+            $response_post = Post::with('categories', 'user', 'likes')->find($post->id);
 
-            event(new Posted($post));
+            // CAUTION: Updateでも追加イベントが発火してしまう
+            event(new Posted($response_post));
 
             return response()->json([
                 'status' => true,

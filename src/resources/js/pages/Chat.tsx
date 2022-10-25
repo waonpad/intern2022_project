@@ -32,30 +32,24 @@ import CardHeader from '@mui/material/CardHeader';
 import CardMedia from '@mui/material/CardMedia';
 import CardContent from '@mui/material/CardContent';
 import CardActions from '@mui/material/CardActions';
+import Chip from '@mui/material/Chip';
+import Stack from '@mui/material/Stack';
 import Collapse from '@mui/material/Collapse';
 import IconButton, { IconButtonProps } from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
+import CircularProgress from '@mui/material/CircularProgress';
 import { red } from '@mui/material/colors';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import ShareIcon from '@mui/icons-material/Share';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
 
-interface PostData {
-    // id: number | null;
-    title: string;
-    comment: string;
-    categories: string[];
-    submit: string;
-}
+import {useAuth} from "../AuthContext";
 
-interface PostErrorData {
-    // id: string;
-    title: string;
-    comment: string;
-    categories: string;
-    submit: string;
-}
+import PostForm from '../components/PostForm';
+import Modal from "react-modal";
 
 declare global {
     interface Window {
@@ -63,85 +57,26 @@ declare global {
     }
 }
 
+const customStyles = {
+    content: {
+        top: '50%',
+        left: '50%',
+        right: 'auto',
+        bottom: 'auto',
+        marginRight: '-50%',
+        transform: 'translate(-50%, -50%)',
+    },
+}
+
+Modal.setAppElement("#app");
+
 const theme = createTheme();
 
 function Chat(): React.ReactElement {
 
-    const basicSchema = Yup.object().shape({
-        title: Yup.string().max(50).required()
-    });
-
-    const { register, handleSubmit, setError, clearErrors, formState: { errors } } = useForm<PostData>({
-        mode: 'onBlur',
-        defaultValues: {
-        },
-        resolver: yupResolver(basicSchema)
-    });
-
+    const auth = useAuth();
+    const [post_loading, setPostLoading] = useState(true);
     const [loading, setLoading] = useState(false);
-
-    // tinyMCE /////////////////////////////////////////////////////////////
-    const [comment, setComment] = useState('');
-    const [comment_error, setCommentError] = useState(false);
-    const handleEditorChange = (content: any, editor: any) => {
-        console.log("Content was updated:", content);
-        setComment(content);
-        if(content === '') {
-            setCommentError(true);
-        }
-        else {
-            setCommentError(false);
-        }
-    };
-    /////////////////////////////////////////////////////////////////////////
-
-    // Categoriess /////////////////////////////////////////////////////////////
-    const [categories, setCategories] = useState<MuiChipsInputChip[]>([]);
-
-    const handleSelecetedCategories = (selectedItem: MuiChipsInputChip[]) => {
-        setCategories(selectedItem);
-    }
-    //////////////////////////////////////////////////////////////////////
-
-    const onSubmit: SubmitHandler<PostData> = (data: PostData) => {
-        if(comment === '') {
-            setCommentError(true);
-            return false;
-        }
-        else {
-            setCommentError(false);
-        }
-        data.comment = comment;
-        data.categories = categories;
-        console.log(data);
-        setLoading(true)
-
-        axios.post('/api/post/upsert', data).then(res => {
-            console.log(res);
-            if(res.data.status === true) {
-                swal("送信成功", "送信成功", "success");
-                console.log(res);
-                setLoading(false);
-            }
-            else {
-                const obj: PostErrorData = res.data.validation_errors;
-                (Object.keys(obj) as (keyof PostErrorData)[]).forEach((key) => setError(key, {
-                    type: 'manual',
-                    message: obj[key]
-                }))
-    
-                setLoading(false)
-            }
-        })
-        .catch(error => {
-            console.log(error)
-            setError('submit', {
-            type: 'manual',
-            message: '送信に失敗しました'
-        })
-            setLoading(false);
-        })
-    }
 
     // Channel ////////////////////////////////////////////////////////////////////
     const [posts, setPosts] = useState<any[]>([]);
@@ -152,27 +87,84 @@ function Chat(): React.ReactElement {
                 console.log(res);
                 console.log(res.data.posts);
                 setPosts(res.data.posts);
-                // setLoading(false);
+                setPostLoading(false);
+                console.log('投稿取得完了');
             }
         });
 
-
-        window.Echo.channel('post').listen('Posted', (e: any) => {
-            console.log(e);
-            console.log(e.post);
-            setPosts([...posts, e.post]);
+        window.Echo.channel('post').listen('Posted', (channel_event: any) => {
+            console.log(channel_event);
+            console.log(channel_event.post);
+            setPosts(posts => [...posts, channel_event.post]);
             console.log(posts);
+            console.log('新しい投稿を受信');
         });
 	}, [])
     /////////////////////////////////////////////////////////////////////////////////////
 
     // LikeToggle ////////////////////////////////////////////////////////////////
     const handleLikeToggle = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+        const post_id = event.currentTarget.getAttribute('data-like-id');
+
+        axios.post('/api/post/liketoggle', {post_id: post_id}).then(res => {
+            console.log(res);
+            if(res.data.status === true) {
+                const like_status = res.data.like_status;
+                const target_post = posts.find((post) => (post.id == post_id));
+                target_post.like_status = like_status;
+                setPosts((posts) => posts.map((post) => (post.id === post_id ? target_post : post)));
+                console.log(`いいね状態: ${like_status}`);
+            }
+            else {
+                console.log(res);
+            }
+        })
+        .catch(error => {
+            console.log(error)
+        })
+    };
+    //////////////////////////////////////////////////////////////////////////////////////////
+
+    // DeletePost //////////////////////////////////////////////////////////////
+    const handleDeletePost = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+        const post_id = event.currentTarget.getAttribute('data-delete-id');
+
+        axios.post('/api/post/destroy', {post_id: post_id}).then(res => {
+            console.log(res);
+            if(res.data.status === true) {
+                const target_post = posts.find((post) => (post.id == post_id));
+                setPosts(posts.filter((post, index) => (post.id !== target_post.id)));
+                console.log('投稿削除成功');
+            }
+            else {
+                console.log(res);
+            }
+        })
+        .catch(error => {
+            console.log(error)
+        })
+    };
+    ////////////////////////////////////////////////////////////////////////////////////
+
+    // EditPost in Modal ////////////////////////////////////////////////////////////////
+    const [modalIsOpen, setIsOpen] = useState(false);
+    const [edit_target_post, setEditTargetPost] = useState<any[]>([]);
+
+    const handleEditPost = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+        const post_id = event.currentTarget.getAttribute('data-edit-id');
+        const target_post = posts.find((post) => (post.id == post_id));
+        setEditTargetPost(target_post);
+        setIsOpen(true);
+
     };
 
     return (
         <ThemeProvider theme={theme}>
-          <Container component="main" maxWidth={false}>
+          <Container component="main" maxWidth={'md'} sx={{padding: 0}}>
+            <Modal isOpen={modalIsOpen} style={customStyles}>
+                <PostForm post={edit_target_post} handleModalClose={setIsOpen}/>
+                <Button onClick={() => setIsOpen(false)}>Close Modal</Button>
+            </Modal>
             <CssBaseline />
                 <Box
                     sx={{
@@ -180,132 +172,66 @@ function Chat(): React.ReactElement {
                     }}
                 >
                     <Grid container spacing={2} direction="column" alignItems="center" justifyContent="center">
-                        { posts.map((post, index) => (
-                            <Grid item xs={12} key={index}>
-                                <Card elevation={3}>
-                                    <CardHeader
-                                        avatar={
-                                        <Avatar sx={{ bgcolor: red[500] }} aria-label="recipe">
-                                            R
-                                        </Avatar>
-                                        }
-                                        action={
-                                        <IconButton aria-label="settings">
-                                            <MoreVertIcon />
-                                        </IconButton>
-                                        }
-                                        title="Shrimp and Chorizo Paella"
-                                        subheader="September 14, 2016"
-                                    />
-                                    <CardMedia
-                                        component="img"
-                                        height="194"
-                                        image="/static/images/cards/paella.jpg"
-                                        alt="Paella dish"
-                                    />
-                                    <CardContent>
-                                        <Typography variant="body2" color="text.secondary">
-                                        This impressive paella is a perfect party dish and a fun meal to cook
-                                        together with your guests. Add 1 cup of frozen peas along with the mussels,
-                                        if you like.
-                                        </Typography>
-                                    </CardContent>
-                                    <CardActions disableSpacing>
-                                        <IconButton id={post.id} onClick={handleLikeToggle} aria-label="add to favorites">
-                                        <FavoriteIcon />
-                                        </IconButton>
-                                        {/* <IconButton aria-label="share">
-                                        <ShareIcon />
-                                        </IconButton> */}
-                                    </CardActions>
-                                </Card>
-                            </Grid>
-                        ))}
+                        {!post_loading ? (
+                            posts.map((post, index) => (
+                                <Grid item xs={12} sx={{minWidth: '100%'}} key={index}>
+                                    <Card elevation={3}>
+                                        <CardHeader
+                                            action={
+                                            <IconButton aria-label="settings">
+                                                <MoreVertIcon />
+                                                {/* TODO: アクション追加 */}
+                                            </IconButton>
+                                            }
+                                            title={post.title}
+                                            subheader={
+                                                <React.Fragment>
+                                                    <Link to={`/user/${post.user.screen_name}`}>{post.user.name}</Link>
+                                                    <Typography>{post.created_at}</Typography>
+                                                </React.Fragment>
+                                            }
+                                            sx={{pb: 1}}
+                                        />
+                                        <CardContent sx={{pt: 0}}>
+                                            <Stack direction="row" spacing={0} sx={{ flexWrap: 'wrap', gap: 1 }}>
+                                                {(post.categories as any[]).map((category: any, index: number) => (
+                                                    <Chip label={category.name} key={index} />
+                                                ))}
+                                            </Stack>
+                                            <Typography variant="body2" component="div" color="text.secondary" dangerouslySetInnerHTML={{ __html: post.comment }} sx={{pt: 2}} />
+                                        </CardContent>
+                                        <CardActions disableSpacing>
+                                            {auth?.user ?
+                                                auth?.user.id == post.user.id ? (
+                                                    <React.Fragment>
+                                                        <IconButton data-edit-id={post.id} onClick={handleEditPost}>
+                                                            <EditIcon />
+                                                        </IconButton>
+                                                        <IconButton data-delete-id={post.id} onClick={handleDeletePost}>
+                                                            <DeleteIcon />
+                                                        </IconButton>
+                                                    </React.Fragment>
+                                            ) : (
+                                                // いいねボタン
+                                                <IconButton data-like-id={post.id} onClick={handleLikeToggle} aria-label="add to favorites">
+                                                    <FavoriteIcon color={post.like_status ? 'secondary' : 'inherit'} />
+                                                </IconButton>
+                                            ) : (
+                                                // (ログインしていない(今後ログインしていなくても見れるようにするかも) いいねボタン?)
+                                                <IconButton data-like-id={post.id} onClick={handleLikeToggle} aria-label="add to favorites">
+                                                    <FavoriteIcon color={post.like_status ? 'secondary' : 'inherit'} />
+                                                </IconButton>
+                                            )}
+                                        </CardActions>
+                                    </Card>
+                                </Grid>
+                            ))
+                        ) : (
+                            <CircularProgress />
+                        )}
                     </Grid>
                 </Box>
-                <Box
-                    sx={{
-                        marginTop: 8,
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                    }}
-                    >
-                    {/* <Typography component="h1" variant="h5">
-                        Post
-                    </Typography> */}
-                    <Box component="form" noValidate onSubmit={handleSubmit(onSubmit)} sx={{ mt: 3 }}>
-                        <Grid container spacing={2}>
-                            <Grid item xs={12}>
-                                <TextField
-                                    required
-                                    fullWidth
-                                    id="post_title"
-                                    label="Post Title"
-                                    autoComplete="post-title"
-                                    {...register('title')}
-                                    error={errors.title ? true : false}
-                                    helperText={errors.title?.message}
-                                />
-                            </Grid>
-                            <Grid item xs={12}>
-                                <MuiChipsInput
-                                    value={(categories as string[])}
-                                    onChange={handleSelecetedCategories}
-                                    fullWidth
-                                    variant='outlined'
-                                    id='categories'
-                                    label='Categories'
-                                    placeholder=''
-                                    aria-multiline
-                                    maxRows={10}
-                                    validate={(chipValue) => {
-                                        return {
-                                            isError: chipValue.length > 50,
-                                            textError: 'the value must be at least 50 characters long'
-                                        }
-                                    }}
-                                />
-                                <FormHelperText sx={{mt: 1, ml: 2}}>Double click to edit a category</FormHelperText>
-                            </Grid>
-                            <Grid item xs={12}>
-                                <Editor
-                                    apiKey={process.env.MIX_APP_TINY_MCE_APP_KEY}
-                                    // initialValue="<p>This is the initial content of the editor</p>"
-                                    init={{
-                                    skin: "material-classic",
-                                    content_css: 'material-classic',
-                                    icons: "material",
-                                    placeholder: "Comment",
-
-                                    height: 200,
-                                    menubar: true,
-                                    // plugins: [
-                                    //     "advlist autolink lists link image charmap print preview anchor",
-                                    //     "searchreplace visualblocks code fullscreen textcolor ",
-                                    //     "insertdatetime media table paste code help wordcount"
-                                    // ],
-                                    textcolor_rows: "4",
-                                    toolbar:
-                                        "undo redo | styleselect | fontsizeselect| code | bold italic | alignleft aligncenter alignright alignjustify | outdent indent "
-                                    }}
-                                    onEditorChange={handleEditorChange}
-                                    // toolbar="code"
-                                />
-                                <FormHelperText sx={{mt: 1, ml: 2, color: '#d32f2f'}}>{comment_error ? 'comment is a required field' : ''}</FormHelperText>
-                            </Grid>
-                        </Grid>
-                        <LoadingButton
-                            type="submit"
-                            loading={loading}
-                            fullWidth
-                            variant="contained"
-                            sx={{ mt: 3, mb: 2 }}
-                        >
-                            Post
-                        </LoadingButton>
-                    </Box>
-                </Box>
+                <PostForm />
             </Container>
         </ThemeProvider>
     );
