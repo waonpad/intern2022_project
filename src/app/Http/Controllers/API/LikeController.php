@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
-class likeController extends Controller
+class LikeController extends Controller
 {
     public function likeToggle(Request $request) {
-        $user = $request->user();
+        $user = Auth::user();
         $toggle_result = $user->likes()->toggle($request->post_id);
 
         if(in_array($request->post_id, $toggle_result['attached'])) {
