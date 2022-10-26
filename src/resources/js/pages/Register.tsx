@@ -28,30 +28,7 @@ import { LoadingButton } from '@mui/lab';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as Yup from 'yup';
 import {useAuth} from "../AuthContext";
-
-interface RegisterData {
-    screen_name: string;
-    name: string;
-    email: string;
-    password: string;
-    password_confirmation: string;
-    description: string;
-    age: number;
-    gender: 'male' | 'female';
-    submit: string;
-}
-
-interface RegisterErrorData {
-    screen_name: string;
-    name: string;
-    email: string;
-    password: string;
-    password_confirmation: string;
-    description: string;
-    age: string;
-    gender: string;
-    submit: string;
-}
+import { RegisterData, RegisterErrorData } from '../../../@types/AuthTypes';
 
 function Copyright(props: any) {
   return (

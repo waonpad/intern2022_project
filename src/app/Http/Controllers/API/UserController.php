@@ -42,7 +42,6 @@ class UserController extends Controller
         return response()->json([
             'status' => true,
             'user' => $target_user,
-            'auth_user' => $auth_user,
             'myself' => $myself,
             'follow' => $follow,
             'followed' => $followed
