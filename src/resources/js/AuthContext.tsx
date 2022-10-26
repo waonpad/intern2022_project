@@ -4,46 +4,7 @@ import {Route, Redirect, useHistory} from "react-router-dom"
 import Backdrop from '@material-ui/core/Backdrop';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
-
-interface User {
-	id: number
-	screen_name: string
-	name: string
-	email: string
-	email_verified_at: string | null
-	two_factor_recovery_codes: string | null
-	two_factor_secret: string | null
-	created_at: string
-	updated_at: string | null
-}
-interface LoginData {
-	email: string,
-	password: string,
-}
-interface RegisterData {
-	screen_name: string,
-	name: string,
-	email: string,
-	password: string,
-	password_confirmation: string,
-}
-interface authProps {
-	user: User | null;
-	register: (registerData: RegisterData) => Promise<void>
-	signin: (loginData: LoginData) => Promise<void>;
-	signout: () => Promise<void>;
-}
-interface Props {
-  	children: ReactNode
-}
-interface RouteProps {
-	children: ReactNode,
-	path: string,
-	exact?: boolean
-}
-interface From {
-  	from: Location
-}
+import { User, LoginData, RegisterData, authProps, Props, RouteProps, From } from "../../@types/AuthTypes";
 
 const authContext = createContext<authProps | null>(null)
 

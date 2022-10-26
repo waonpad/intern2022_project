@@ -23,12 +23,7 @@ import { LoadingButton } from '@mui/lab';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as Yup from 'yup';
 import {useAuth} from "../AuthContext";
-
-interface LoginData {
-  email: string;
-  password: string;
-  submit: string;
-}
+import { LoginData, LoginErrorData } from '../../../@types/AuthTypes';
 
 function Copyright(props: any) {
   return (
@@ -99,7 +94,7 @@ export default function LogIn(): React.ReactElement {
             const obj: LoginData = res.data.validation_errors;
 
             // https://qiita.com/mizuki_r/items/1950dfc27824b3ecd6c7
-            (Object.keys(obj) as (keyof LoginData)[]).forEach((key) => setError(key, {
+            (Object.keys(obj) as (keyof LoginErrorData)[]).forEach((key) => setError(key, {
               type: 'manual',
               message: obj[key]
             }))

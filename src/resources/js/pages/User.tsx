@@ -23,14 +23,7 @@ function User(): React.ReactElement {
         })
     }
 
-    const [userData, setUserData] = useState({
-        screen_name: '',
-        name: '',
-        email: '',
-        description: '',
-        age: '',
-        gender: ''
-    });
+    const [userData, setUserData] = useState<any>({});
 
     const data = {
         screen_name: id,

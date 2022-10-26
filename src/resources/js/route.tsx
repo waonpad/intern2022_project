@@ -92,10 +92,10 @@ function App(): React.ReactElement {
                         <PublicRoute path='/register' exact><Register/></PublicRoute>
                         <PublicRoute path='/login' exact><Login/></PublicRoute>
                         <Route path='/user/:id' exact component={User} />
-                        <PrivateRoute path='/chat' exact><Chat/></PrivateRoute>
+                        <PrivateRoute key={'index'} path='/chat' exact><Chat/></PrivateRoute>
                         <PrivateRoute path='/privatechat/:id' exact><PrivateChat/></PrivateRoute>
                         <PrivateRoute path='/groupchat/:id' exact><GroupChat/></PrivateRoute>
-                        <PrivateRoute path='/postform' exact><PostForm/></PrivateRoute>
+                        <PrivateRoute key={'category'} path='/category/:category_id' exact><Chat/></PrivateRoute>
                         <Route path='*' exact component={Page404} />
                     </Switch>
                 </Header>

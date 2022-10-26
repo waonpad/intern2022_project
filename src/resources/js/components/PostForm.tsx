@@ -11,22 +11,12 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import * as Yup from 'yup';
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
+import { PostData, PostErrorData } from '../../../@types/postTypes';
 
-interface PostData {
-    id: number | null;
-    title: string;
-    comment: string;
-    categories: string[];
-    submit: string;
-}
-
-interface PostErrorData {
-    id: string;
-    title: string;
-    comment: string;
-    categories: string;
-    submit: string;
-}
+// Edit Comment Props
+// -------------------
+// post: any
+// handleModalClose: Function
 
 function PostForm(props: any): React.ReactElement {
     const basicSchema = Yup.object().shape({
@@ -63,7 +53,7 @@ function PostForm(props: any): React.ReactElement {
     const [comment, setComment] = useState('');
     const [comment_error, setCommentError] = useState(false);
     const handleEditorChange = (content: any, editor: any) => {
-        console.log("Content was updated:", content);
+        // console.log("Content was updated:", content);
         setComment(content);
         if(content === '') {
             setCommentError(true);
@@ -106,9 +96,10 @@ function PostForm(props: any): React.ReactElement {
             console.log(res);
             if(res.data.status === true) {
                 swal("送信成功", "送信成功", "success");
-                console.log(res);
                 setLoading(false);
-                props?.handleModalClose(false);
+                if(props?.post) {
+                    props?.handleModalClose(false);
+                }
             }
             else {
                 const obj: PostErrorData = res.data.validation_errors;

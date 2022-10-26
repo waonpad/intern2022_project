@@ -1,68 +1,31 @@
 import React, { useState, useEffect } from 'react';
-import swal from "sweetalert";
-import ReactDOM from 'react-dom';
-// import { Button } from '@material-ui/core';
+import { Button } from '@material-ui/core';
 import { Link } from "react-router-dom";
 import axios from 'axios';
-import { useForm, SubmitHandler } from "react-hook-form";
-import TextField from '@mui/material/TextField';
 import Card from '@mui/material/Card';
-import { LoadingButton } from '@mui/lab';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { Editor } from '@tinymce/tinymce-react';
-import { MuiChipsInput, MuiChipsInputChip } from 'mui-chips-input';
-import FormHelperText from '@mui/material/FormHelperText';
-import { yupResolver } from '@hookform/resolvers/yup';
-import * as Yup from 'yup';
-
-import FormLabel from '@mui/material/FormLabel';
-import FormControl from '@mui/material/FormControl';
-import FormGroup from '@mui/material/FormGroup';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Checkbox from '@mui/material/Checkbox';
-import Avatar from '@mui/material/Avatar';
 import CssBaseline from '@mui/material/CssBaseline';
 // import Link from '@mui/material/Link';
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
-import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Container from '@mui/material/Container';
-import { styled } from '@mui/material/styles';
 import CardHeader from '@mui/material/CardHeader';
-import CardMedia from '@mui/material/CardMedia';
 import CardContent from '@mui/material/CardContent';
 import CardActions from '@mui/material/CardActions';
 import Chip from '@mui/material/Chip';
 import Stack from '@mui/material/Stack';
-import Collapse from '@mui/material/Collapse';
 import IconButton, { IconButtonProps } from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import CircularProgress from '@mui/material/CircularProgress';
-import { red } from '@mui/material/colors';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import ShareIcon from '@mui/icons-material/Share';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-
 import {useAuth} from "../AuthContext";
-
-interface PostData {
-    // id: number | null;
-    title: string;
-    comment: string;
-    categories: string[];
-    submit: string;
-}
-
-interface PostErrorData {
-    // id: string;
-    title: string;
-    comment: string;
-    categories: string;
-    submit: string;
-}
+import PostForm from '../components/PostForm';
+import Modal from "react-modal";
 
 declare global {
     interface Window {
@@ -70,94 +33,26 @@ declare global {
     }
 }
 
+const customStyles = {
+    content: {
+        top: '50%',
+        left: '50%',
+        right: 'auto',
+        bottom: 'auto',
+        marginRight: '-50%',
+        transform: 'translate(-50%, -50%)',
+    },
+}
+
+Modal.setAppElement("#app");
+
 const theme = createTheme();
 
 function Chat(): React.ReactElement {
 
-    const basicSchema = Yup.object().shape({
-        title: Yup.string().max(50).required()
-    });
-
-    const { register, handleSubmit, setError, clearErrors, formState: { errors }, reset } = useForm<PostData>({
-        mode: 'onBlur',
-        defaultValues: {
-        },
-        resolver: yupResolver(basicSchema)
-    });
-
     const auth = useAuth();
     const [post_loading, setPostLoading] = useState(true);
     const [loading, setLoading] = useState(false);
-
-    // tinyMCE /////////////////////////////////////////////////////////////
-    const [comment, setComment] = useState('');
-    const [comment_error, setCommentError] = useState(false);
-    const handleEditorChange = (content: any, editor: any) => {
-        console.log("Content was updated:", content);
-        setComment(content);
-        if(content === '') {
-            setCommentError(true);
-        }
-        else {
-            setCommentError(false);
-        }
-    };
-    /////////////////////////////////////////////////////////////////////////
-
-    // Categoriess /////////////////////////////////////////////////////////////
-    const [categories, setCategories] = useState<MuiChipsInputChip[]>([]);
-
-    const handleSelecetedCategories = (selectedItem: MuiChipsInputChip[]) => {
-        setCategories(selectedItem);
-    }
-    //////////////////////////////////////////////////////////////////////
-
-    // Submit //////////////////////////////////////////////////////////
-    const onSubmit: SubmitHandler<PostData> = (data: PostData) => {
-        if(comment === '') {
-            setCommentError(true);
-            return false;
-        }
-        else {
-            setCommentError(false);
-        }
-        data.comment = comment;
-        data.categories = categories;
-        console.log(data);
-        setLoading(true);
-        setCategories([]);
-        setComment('');
-        reset();
-        // Enterしていないカテゴリーの入力欄はリセットされない
-        // Commentが空白になるのでrequiredが出る
-
-        axios.post('/api/post/upsert', data).then(res => {
-            console.log(res);
-            if(res.data.status === true) {
-                swal("送信成功", "送信成功", "success");
-                console.log(res);
-                setLoading(false);
-            }
-            else {
-                const obj: PostErrorData = res.data.validation_errors;
-                (Object.keys(obj) as (keyof PostErrorData)[]).forEach((key) => setError(key, {
-                    type: 'manual',
-                    message: obj[key]
-                }))
-    
-                setLoading(false)
-            }
-        })
-        .catch(error => {
-            console.log(error)
-            setError('submit', {
-            type: 'manual',
-            message: '送信に失敗しました'
-        })
-            setLoading(false);
-        })
-    }
-    /////////////////////////////////////////////////////////////////////////
 
     // Channel ////////////////////////////////////////////////////////////////////
     const [posts, setPosts] = useState<any[]>([]);
@@ -176,9 +71,15 @@ function Chat(): React.ReactElement {
         window.Echo.channel('post').listen('Posted', (channel_event: any) => {
             console.log(channel_event);
             console.log(channel_event.post);
-            setPosts(posts => [...posts, channel_event.post]);
-            console.log(posts);
-            console.log('新しい投稿を受信');
+            console.log(channel_event.event_type);
+            if(channel_event.event_type === 'create') {
+                setPosts(posts => [...posts, channel_event.post]);
+                console.log('新しい投稿を受信');
+            }
+            if(channel_event.event_type === 'update') {
+                setPosts((posts) => posts.map((post) => (post.id === channel_event.post.id ? channel_event.post : post)));
+                console.log('投稿の更新を受信');
+            }
         });
 	}, [])
     /////////////////////////////////////////////////////////////////////////////////////
@@ -227,9 +128,26 @@ function Chat(): React.ReactElement {
     };
     ////////////////////////////////////////////////////////////////////////////////////
 
+    // EditPost in Modal ////////////////////////////////////////////////////////////////
+    const [modalIsOpen, setIsOpen] = useState(false);
+    const [edit_target_post, setEditTargetPost] = useState<any[]>([]);
+
+    const handleEditPost = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+        const post_id = event.currentTarget.getAttribute('data-edit-id');
+        const target_post = posts.find((post) => (post.id == post_id));
+        setEditTargetPost(target_post);
+        setIsOpen(true);
+
+    };
+    ////////////////////////////////////////////////////////////////////////////////
+
     return (
         <ThemeProvider theme={theme}>
           <Container component="main" maxWidth={'md'} sx={{padding: 0}}>
+            <Modal isOpen={modalIsOpen} style={customStyles}>
+                <PostForm post={edit_target_post} handleModalClose={setIsOpen}/>
+                <Button onClick={() => setIsOpen(false)}>Close Modal</Button>
+            </Modal>
             <CssBaseline />
                 <Box
                     sx={{
@@ -269,7 +187,7 @@ function Chat(): React.ReactElement {
                                             {auth?.user ?
                                                 auth?.user.id == post.user.id ? (
                                                     <React.Fragment>
-                                                        <IconButton>
+                                                        <IconButton data-edit-id={post.id} onClick={handleEditPost}>
                                                             <EditIcon />
                                                         </IconButton>
                                                         <IconButton data-delete-id={post.id} onClick={handleDeletePost}>
@@ -296,79 +214,7 @@ function Chat(): React.ReactElement {
                         )}
                     </Grid>
                 </Box>
-                <Box
-                    sx={{
-                        marginTop: 8,
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                    }}
-                    >
-                    <Box component="form" noValidate onSubmit={handleSubmit(onSubmit)} sx={{ mt: 3, minWidth: '100%' }}>
-                        <Grid container spacing={2}>
-                            <Grid item xs={12}>
-                                <TextField
-                                    required
-                                    fullWidth
-                                    id="post-title"
-                                    label="Post Title"
-                                    autoComplete="post-title"
-                                    {...register('title')}
-                                    error={errors.title ? true : false}
-                                    helperText={errors.title?.message}
-                                />
-                            </Grid>
-                            <Grid item xs={12}>
-                                <MuiChipsInput
-                                    value={(categories as string[])}
-                                    onChange={handleSelecetedCategories}
-                                    fullWidth
-                                    variant='outlined'
-                                    id='categories'
-                                    label='Categories'
-                                    placeholder=''
-                                    aria-multiline
-                                    maxRows={10}
-                                    validate={(chipValue) => {
-                                        return {
-                                            isError: chipValue.length > 50,
-                                            textError: 'the value must be at least 50 characters long'
-                                        }
-                                    }}
-                                />
-                                <FormHelperText sx={{mt: 1, ml: 2}}>Double click to edit a category</FormHelperText>
-                            </Grid>
-                            <Grid item xs={12}>
-                                <Editor
-                                    apiKey={process.env.MIX_APP_TINY_MCE_APP_KEY}
-                                    // initialValue="<p>This is the initial content of the editor</p>"
-                                    init={{
-                                    skin: "material-classic",
-                                    content_css: 'material-classic',
-                                    icons: "material",
-                                    placeholder: "Comment",
-                                    height: 200,
-                                    menubar: true,
-                                    textcolor_rows: "4",
-                                    toolbar:
-                                        "undo redo | styleselect | fontsizeselect| code | bold italic | alignleft aligncenter alignright alignjustify | outdent indent "
-                                    }}
-                                    onEditorChange={handleEditorChange}
-                                />
-                                <FormHelperText sx={{mt: 1, ml: 2, color: '#d32f2f'}}>{comment_error ? 'comment is a required field' : ''}</FormHelperText>
-                            </Grid>
-                        </Grid>
-                        <LoadingButton
-                            type="submit"
-                            loading={loading}
-                            fullWidth
-                            variant="contained"
-                            sx={{ mt: 3, mb: 2 }}
-                        >
-                            Post
-                        </LoadingButton>
-                    </Box>
-                </Box>
+                <PostForm />
             </Container>
         </ThemeProvider>
     );

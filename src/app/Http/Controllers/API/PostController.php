@@ -37,6 +37,8 @@ class PostController extends Controller
             ]);
         } else {
             $user = Auth::user();
+
+            $event_type = $request->id !== null ? 'update' : 'create';
         
             $post = Post::updateOrCreate(
                 ['id' => $request->id],
@@ -61,12 +63,11 @@ class PostController extends Controller
             $post->categories()->sync(array_column($sync_categories, 'id'));
             $response_post = Post::with('categories', 'user', 'likes')->find($post->id);
 
-            // CAUTION: Updateでも追加イベントが発火してしまう
-            event(new Posted($response_post));
+            event(new Posted($response_post, $event_type));
 
             return response()->json([
                 'status' => true,
-                'message' => '投稿しました。',
+                'upsert_status' => $event_type,
                 'post' => $response_post
             ]);
         }
@@ -110,6 +111,21 @@ class PostController extends Controller
         return response()->json([
             'status' => true,
             'posts' => $posts
+        ]);
+    }
+
+    public function category(Request $request)
+    {
+        $posts = category::with('posts.categories', 'posts.user', 'posts.likes')->find($request->category_id)->posts;
+
+        foreach($posts as $post) {
+            $post['like_status'] = in_array(Auth::id(), $post->likes->pluck('id')->toArray());
+        };
+
+        return response()->json([
+            'status' => true,
+            'posts' => $posts,
+            'category_id' => $request->category_id
         ]);
     }
 }
