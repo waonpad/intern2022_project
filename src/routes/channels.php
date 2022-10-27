@@ -44,3 +44,7 @@ Broadcast::channel('group_post.{group_id}', function ($user, $group_id){
 });
 
 // UserOriginalChannels
+
+Broadcast::channel('category_post.{category_id}', function (){
+    return true;
+});

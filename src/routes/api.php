@@ -63,7 +63,7 @@ Route::middleware('auth:sanctum')->group(function() {
         Route::get('/show', [PostController::class, 'show']);
         Route::post('/upsert', [PostController::class, 'upsert']);
         Route::post('/destroy', [PostController::class, 'destroy']);
-        // Route::post('/search', [PostController::class, 'search']);
+        Route::post('/search', [PostController::class, 'search']);
         Route::post('/liketoggle', [LikeController::class, 'likeToggle']);
 
         Route::get('/category', [PostController::class, 'category']);
