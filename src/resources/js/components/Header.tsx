@@ -18,9 +18,8 @@ import NotificationsIcon from '@material-ui/icons/Notifications';
 import MoreIcon from '@material-ui/icons/MoreVert';
 import ReactLoading from 'react-loading';
 import ReactDOM from 'react-dom';
-import { Button, Card } from '@material-ui/core';
+import { Button, Card, Box } from '@material-ui/core';
 import clsx from 'clsx';
-import Drawer from '@material-ui/core/Drawer';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import List from '@material-ui/core/List';
 import Divider from '@material-ui/core/Divider';
@@ -33,130 +32,31 @@ import InboxIcon from '@material-ui/icons/MoveToInbox';
 import { Link, useHistory } from "react-router-dom";
 import axios from 'axios';
 import swal from 'sweetalert';
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as Yup from 'yup';
+import { useForm, SubmitHandler } from "react-hook-form";
 
 import { useAuth } from "../AuthContext";
+import { HeaderStyle } from '../styles/HeaderStyle';
+
+import Drawer from "./Drawer";
+import HeaderSearch from "./HeaderSearch";
 
 interface Props {
   children: ReactNode
 }
 
-const drawerWidth = 240;
-
-const useStyles = makeStyles((theme: Theme) =>
-  createStyles({
-    root: {
-      display: 'flex',
-    },
-    grow: {
-      flexGrow: 1,
-    },
-    appBar: {
-      zIndex: theme.zIndex.drawer + 1,
-    },
-    menuButton: {
-      marginRight: theme.spacing(2),
-    },
-    title: {
-      display: 'none',
-      [theme.breakpoints.up('sm')]: {
-        display: 'block',
-      },
-    },
-    search: {
-      position: 'relative',
-      borderRadius: theme.shape.borderRadius,
-      backgroundColor: alpha(theme.palette.common.white, 0.15),
-      '&:hover': {
-        backgroundColor: alpha(theme.palette.common.white, 0.25),
-      },
-      marginRight: theme.spacing(2),
-      marginLeft: 0,
-      width: '100%',
-      [theme.breakpoints.up('sm')]: {
-        marginLeft: theme.spacing(3),
-        width: 'auto',
-      },
-    },
-    searchIcon: {
-      padding: theme.spacing(0, 2),
-      height: '100%',
-      position: 'absolute',
-      pointerEvents: 'none',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-    },
-    inputRoot: {
-      color: 'inherit',
-    },
-    inputInput: {
-      padding: theme.spacing(1, 1, 1, 0),
-      // vertical padding + font size from searchIcon
-      paddingLeft: `calc(1em + ${theme.spacing(4)}px)`,
-      transition: theme.transitions.create('width'),
-      width: '100%',
-      [theme.breakpoints.up('md')]: {
-        width: '20ch',
-      },
-    },
-    sectionDesktop: {
-      display: 'none',
-      [theme.breakpoints.up('md')]: {
-        display: 'flex',
-      },
-    },
-    sectionMobile: {
-      display: 'flex',
-      [theme.breakpoints.up('md')]: {
-        display: 'none',
-      },
-    },
-    hide: {
-      display: 'none',
-    },
-    drawer: {
-      width: drawerWidth,
-      flexShrink: 0,
-    },
-    drawerPaper: {
-      width: drawerWidth,
-    },
-    drawerHeader: {
-      display: 'flex',
-      alignItems: 'center',
-      padding: theme.spacing(0, 1),
-      // necessary for content to be below app bar
-      ...theme.mixins.toolbar,
-      justifyContent: 'flex-end',
-    },
-    content: {
-      flexGrow: 1,
-      padding: theme.spacing(3),
-      transition: theme.transitions.create('margin', {
-        easing: theme.transitions.easing.sharp,
-        duration: theme.transitions.duration.leavingScreen,
-      }),
-      marginLeft: -drawerWidth,
-    },
-    contentShift: {
-      // md以上はコンテンツが動く、未満は被さる
-      [theme.breakpoints.up('md')]: {
-        transition: theme.transitions.create('margin', {
-          easing: theme.transitions.easing.easeOut,
-          duration: theme.transitions.duration.enteringScreen,
-        }),
-        marginLeft: 0,
-      }
-    },
-  }),
-);
-
 export default function Header({children}: Props) {
 
-  // original
-  
-  const history = useHistory();
-  const auth = useAuth();
+    // original
+    
+    const history = useHistory();
+    const auth = useAuth();
+
+    // Search /////////////////////////////////////////////////////////
+
+    //////////////////////////////////////////////////////////////////
+
 
   const [unread_notifications, setUnreadNotifications] = useState<any>();
 
@@ -227,7 +127,7 @@ export default function Header({children}: Props) {
 
   // app bar
 
-  const classes = useStyles();
+  const classes = HeaderStyle();
   const theme = useTheme();
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [settingAnchorEl, setSettingAnchorEl] = React.useState<null | HTMLElement>(null);
@@ -398,19 +298,7 @@ export default function Header({children}: Props) {
           <Typography className={classes.title} variant="h6" noWrap component={Link} to={'/'} style={{ textDecoration: 'none', color: 'inherit' }}>
             Material-UI
           </Typography>
-          <div className={classes.search}>
-            <div className={classes.searchIcon}>
-              <SearchIcon />
-            </div>
-            <InputBase
-              placeholder="Search…"
-              classes={{
-                root: classes.inputRoot,
-                input: classes.inputInput,
-              }}
-              inputProps={{ 'aria-label': 'search' }}
-            />
-          </div>
+          <HeaderSearch classes={classes} />
           <div className={classes.grow} />
 
           {!auth?.user ? (
@@ -491,72 +379,7 @@ export default function Header({children}: Props) {
           </div>
         </Toolbar>
       </AppBar>
-      <Drawer
-        className={classes.drawer}
-        variant='persistent'
-        anchor="left"
-        open={open}
-        classes={{
-          paper: classes.drawerPaper,
-        }}
-      >
-        <div className={classes.drawerHeader}>
-          <IconButton onClick={handleDrawerOpen}>
-            {theme.direction === 'ltr' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
-          </IconButton>
-        </div>
-        <Divider />
-        <List>
-          <ListItem button component={Link} to='/' style={{ textDecoration: 'none', color: "inherit" }}>
-            <ListItemIcon><Home /></ListItemIcon>
-            <ListItemText primary='Home'></ListItemText>
-          </ListItem>
-          <ListItem button component={Link} to='/chat' style={{ textDecoration: 'none', color: "inherit" }}>
-            <ListItemIcon><Chat /></ListItemIcon>
-            <ListItemText primary='Chat'></ListItemText>
-          </ListItem>
-          <ListItem button component={Link} to='/privatechat/waonpad' style={{ textDecoration: 'none', color: "inherit" }}>
-            <ListItemIcon><Forum /></ListItemIcon>
-            <ListItemText primary='Private Chat'></ListItemText>
-          </ListItem>
-          <ListItem button component={Link} to='/groupchat/test' style={{ textDecoration: 'none', color: "inherit" }}>
-            <ListItemIcon><Group /></ListItemIcon>
-            <ListItemText primary='Group Chat'></ListItemText>
-          </ListItem>
-          {/* <ListItem button component={Link} to='/wordle/create' style={{ textDecoration: 'none', color: "inherit" }}>
-            <ListItemText primary='Wordle Create'></ListItemText>
-          </ListItem>
-          <ListItem button component={Link} to='/wordle/manage/1' style={{ textDecoration: 'none', color: "inherit" }}>
-            <ListItemText primary='Wordle Manage 1'></ListItemText>
-          </ListItem>
-          <ListItem button component={Link} to='/search' style={{ textDecoration: 'none', color: "inherit" }}>
-            <ListItemText primary='Search'></ListItemText>
-          </ListItem>
-          <ListItem button component={Link} to='/wordle/game/1' style={{ textDecoration: 'none', color: "inherit" }}>
-            <ListItemText primary='Wordle Game 1'></ListItemText>
-          </ListItem>
-          <ListItem button component={Link} to='/wordle/game/1/1' style={{ textDecoration: 'none', color: "inherit" }}>
-            <ListItemText primary='Wordle Game 1 - 1'></ListItemText>
-          </ListItem> */}
-
-
-          {/* {['Inbox', 'Starred', 'Send email', 'Drafts'].map((text, index) => (
-            <ListItem button key={text}>
-              <ListItemIcon>{index % 2 === 0 ? <InboxIcon /> : <MailIcon />}</ListItemIcon>
-              <ListItemText primary={text} />
-            </ListItem>
-          ))}
-        </List>
-        <Divider />
-        <List>
-          {['All mail', 'Trash', 'Spam'].map((text, index) => (
-            <ListItem button key={text}>
-              <ListItemIcon>{index % 2 === 0 ? <InboxIcon /> : <MailIcon />}</ListItemIcon>
-              <ListItemText primary={text} />
-            </ListItem>
-          ))} */}
-        </List>
-      </Drawer>
+      <Drawer open={open} classes={classes} theme={theme} handleDrawerOpen={handleDrawerOpen} />
       <main
         className={clsx(classes.content, {
           [classes.contentShift]: open

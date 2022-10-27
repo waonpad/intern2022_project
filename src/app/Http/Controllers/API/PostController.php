@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use App\Events\Posted;
+use App\Events\CategoryPosted;
 use App\Models\Post;
 use App\Models\Category;
 use Illuminate\Http\Request;
@@ -65,10 +66,15 @@ class PostController extends Controller
 
             event(new Posted($response_post, $event_type));
 
+            // 回すしかない？
+            foreach($sync_categories as $category) {
+                event(new CategoryPosted($response_post, $event_type, $category->id));
+            }
+
             return response()->json([
                 'status' => true,
                 'upsert_status' => $event_type,
-                'post' => $response_post
+                'post' => $response_post,
             ]);
         }
     }
@@ -106,17 +112,17 @@ class PostController extends Controller
 
     public function search(Request $request)
     {
-        $posts = Post::where('user_id', $request->user()->id)->get();
-
+        $category = Category::where('name', $request->search)->first();
+        
         return response()->json([
             'status' => true,
-            'posts' => $posts
+            'category' => $category,
         ]);
     }
 
     public function category(Request $request)
     {
-        $posts = category::with('posts.categories', 'posts.user', 'posts.likes')->find($request->category_id)->posts;
+        $posts = Category::with('posts.categories', 'posts.user', 'posts.likes')->find($request->category_id)->posts;
 
         foreach($posts as $post) {
             $post['like_status'] = in_array(Auth::id(), $post->likes->pluck('id')->toArray());
@@ -125,7 +131,6 @@ class PostController extends Controller
         return response()->json([
             'status' => true,
             'posts' => $posts,
-            'category_id' => $request->category_id
         ]);
     }
 }
