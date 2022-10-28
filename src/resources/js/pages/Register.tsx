@@ -27,8 +27,8 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { LoadingButton } from '@mui/lab';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as Yup from 'yup';
-import {useAuth} from "../AuthContext";
-import { RegisterData, RegisterErrorData } from '../../../@types/AuthTypes';
+import {useAuth} from "../contexts/AuthContext";
+import { RegisterData, RegisterErrorData } from '../../../@types/AuthType';
 
 function Copyright(props: any) {
   return (
@@ -101,10 +101,6 @@ export default function Register(): React.ReactElement {
     console.log(event.target.value);
     setGender(event.target.value);
   };
-
-  useEffect(() => {
-    console.log(gender);
-  }, [gender]);
   
   const onSubmit: SubmitHandler<RegisterData> = (data: RegisterData) => {
     setLoading(true)
@@ -120,7 +116,6 @@ export default function Register(): React.ReactElement {
           else {
             const obj: RegisterErrorData = res.data.validation_errors;
 
-            // https://qiita.com/mizuki_r/items/1950dfc27824b3ecd6c7
             (Object.keys(obj) as (keyof RegisterErrorData)[]).forEach((key) => setError(key, {
               type: 'manual',
               message: obj[key]

@@ -21,11 +21,12 @@ function Top(): React.ReactElement {
     //         data,
     //         {headers: {
     //             Authorization: `Bearer ${process.env.MIX_APP_GITHUB_TOKEN}`,
-    //             // 'Access-Control-Allow-Origin' : 'https://api.github.com/',
-    //             // // 'Access-Control-Allow-Origin' : '*',
+    //             'Access-Control-Allow-Origin' : 'https://api.github.com/',
+    //             // 'Access-Control-Allow-Origin' : '*',
     //             // 'Access-Control-Allow-Credentials': true,
-    //             // "Access-Control-Allow-Headers": "*",
-    //             // 'Access-Control-Allow-Methods':'GET,PUT,POST,DELETE,PATCH,OPTIONS',
+    //             "Access-Control-Allow-Headers": "*",
+    //             'Access-Control-Allow-Methods':'GET,PUT,POST,DELETE,PATCH,OPTIONS',
+    //             // 'content-type': 'application/json',
     //         }}
     //     ).then(res => {
     //         console.log(res);
