@@ -21,10 +21,10 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import {useAuth} from "../AuthContext";
+import {useAuth} from "../contexts/AuthContext";
 import PostForm from '../components/PostForm';
 import Modal from "react-modal";
-import { PostListProps } from '../../../@types/PostListTypes';
+import { PostListProps } from '../../../@types/PostListType';
 
 const customStyles = {
     content: {
