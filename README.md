@@ -11,11 +11,15 @@
 ```
 make build
 ```
-vendorとnode_modulesはvolumeマウントされているためホストOSで閲覧できません  
-必要な場合、srcディレクトリ下でホストにパッケージをインストールしてください  
-  
-mui-chips-inputが原因で型定義エラーが出るので、  
-node_modules/mui-chips-input/node_modulesを各自削除してください
+> #### apkがエラーを吐いた場合
+> docker/php/Dockerfileの8~10行目のコメントアウトを解除  
+> 12,13行目をコメントアウトして再試行するか各自DNSの設定をしてください
+
+> vendorとnode_modulesはvolumeマウントされているためホストOSで閲覧できません  
+> エディタの警告回避等に必要な場合、srcディレクトリ下でホストにパッケージをインストールしてください  
+
+> mui-chips-inputが原因で型定義エラーが出るので、  
+> node_modules/mui-chips-input/node_modulesを各自削除してください
 
 ## Hot Reload
 appコンテナ内でファイルを監視して自動コンパイル  
@@ -28,6 +32,10 @@ appコンテナ内でファイルを監視して自動コンパイル
 - Postの投稿/Like
 - UserのFollow
 - Material UIによるHeader/Drawer Component
+
+## 調整中
+- PrivateChat/Post
+- GroupChat/Post
 
 [Base Repository]: https://github.com/mariebell/fullstack-project
 [Reset CSS]: https://raw.githubusercontent.com/twbs/bootstrap/v4-dev/dist/css/bootstrap-reboot.css
