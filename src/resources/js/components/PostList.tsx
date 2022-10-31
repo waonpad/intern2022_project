@@ -27,6 +27,9 @@ import Modal from "react-modal";
 import { PostListProps } from '../../../@types/PostListType';
 
 const customStyles = {
+    overlay: {
+      zIndex: 100
+    },
     content: {
         top: '50%',
         left: '50%',
@@ -56,7 +59,7 @@ function PostList(props: PostListProps): React.ReactElement {
             if (res.status === 200) {
                 console.log(res);
                 console.log(res.data.posts);
-                setPosts(res.data.posts);
+                setPosts(res.data.posts.reverse());
                 setPostLoading(false);
                 console.log('投稿取得完了');
             }
@@ -65,7 +68,7 @@ function PostList(props: PostListProps): React.ReactElement {
         window.Echo.channel(props.listening_channel).listen(props.listening_event, (channel_event: any) => {
             console.log(channel_event);
             if(channel_event.event_type === 'create') {
-                setPosts(posts => [...posts, channel_event.post]);
+                setPosts(posts => [channel_event.post, ...posts]);
                 console.log('新しい投稿を受信');
             }
             if(channel_event.event_type === 'update') {
@@ -136,7 +139,7 @@ function PostList(props: PostListProps): React.ReactElement {
     return (
         <Box
             sx={{
-                marginTop: 8,
+                marginTop: 2,
             }}
         >
             <Modal isOpen={modalIsOpen} style={customStyles}>

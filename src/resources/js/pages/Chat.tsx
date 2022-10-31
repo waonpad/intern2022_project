@@ -39,6 +39,7 @@ function Chat(): React.ReactElement {
         <ThemeProvider theme={theme}>
           <Container component="main" maxWidth={'md'} sx={{padding: 0}}>
             <CssBaseline />
+                <PostForm />
                 {!initial_loading ? (
                     <PostList
                     post_get_api_method={post_get_api_method}
@@ -50,7 +51,6 @@ function Chat(): React.ReactElement {
                 ) : (
                     <CircularProgress sx={{textAlign: 'center'}} />
                 )}
-                <PostForm />
             </Container>
         </ThemeProvider>
     );
