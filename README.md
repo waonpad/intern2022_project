@@ -1,3 +1,5 @@
+#このリポジトリは開発中です。動作の保証が出来ない部分があります。
+
 ## Feature
 - Laravel ^9.11
 - React ^17.0.2
@@ -5,13 +7,16 @@
 - [Base Repository][Base Repository]
 - [Reset CSS][Reset CSS]
 
-## Start Up (on Windows using MakeFile)
+## Start Up (on Windows using Makefile)
 ```
 make build
 ```
 vendorとnode_modulesはvolumeマウントされているためホストOSで閲覧できません  
 エディタがエラーを吐く場合  
-srcディレクトリ下でホストにパッケージをインストールしてください
+srcディレクトリ下でホストにパッケージをインストールしてください  
+  
+mui-chips-inputが原因で型定義エラーが出るので、  
+src/node_modules/mui-chips-inputを各自削除してください
 
 ## Hot Reload
 appコンテナ内でファイルを監視して自動コンパイル  
@@ -23,7 +28,7 @@ appコンテナ内でファイルを監視して自動コンパイル
 - DataBase Notification
 - Postの投稿/Like
 - UserのFollow
-- Material UIによるのHeader/Drawer Component
+- Material UIによるHeader/Drawer Component
 
 [Base Repository]: https://github.com/mariebell/fullstack-project
 [Reset CSS]: https://raw.githubusercontent.com/twbs/bootstrap/v4-dev/dist/css/bootstrap-reboot.css
