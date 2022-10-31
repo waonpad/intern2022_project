@@ -1,4 +1,4 @@
-# このリポジトリは開発中です。動作の保証が出来ない部分があります。
+## このリポジトリは開発中です。動作の保証が出来ない部分があります。
 
 ## Feature
 - Laravel ^9.11
@@ -12,11 +12,10 @@
 make build
 ```
 vendorとnode_modulesはvolumeマウントされているためホストOSで閲覧できません  
-エディタがエラーを吐く場合  
-srcディレクトリ下でホストにパッケージをインストールしてください  
+必要な場合、srcディレクトリ下でホストにパッケージをインストールしてください  
   
 mui-chips-inputが原因で型定義エラーが出るので、  
-src/node_modules/mui-chips-inputを各自削除してください
+node_modules/mui-chips-input/node_modulesを各自削除してください
 
 ## Hot Reload
 appコンテナ内でファイルを監視して自動コンパイル  
